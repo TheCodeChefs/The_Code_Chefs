@@ -115,4 +115,4 @@ Najprawdopodobniej masz nieprawidłową wartość flagi `--base` dla polecenia
 3. Jeśli wszystkie kroki zakończą się powodzeniem, zmontowana wersja produkcyjna
    plików projektu zostanie wysłana do gałęzi `gh-pages`. W przeciwnym razie w
    logu wykonania skryptu pojawi się informacja o problemie. burcu cucuhead
-   deneme
+   deneme d
