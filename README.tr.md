@@ -82,3 +82,4 @@ dosyasında özel bir komut dosyası (GitHub Action) çalıştırılır.
 kod kalitesi kontrolü ve derleme yapılır.
 3. Eğer tüm adımlar başarılı bir şekilde tamamlanırsa, proje dosyalarının üretime hazır sürümü `gh-pages` 
 dalına gönderilir. Aksi takdirde, komut dosyası çalıştırma günlüğünde sorunun ne olduğu belirtilir.
+11
