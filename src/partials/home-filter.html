@@ -1,0 +1,104 @@
+<section class="filter-main">
+  <!-- Sol filtre paneli -->
+  <aside class="filter-sidebar">
+    <button class="all-categories-button">All categories</button>
+    <ul class="category-list" id="category-list">
+      <!-- JS ile doldurulacak -->
+    </ul>
+
+    <!-- Popüler tarifler buraya alındı -->
+    <div class="popular-recipes">
+      <h4 class="popular-recipes-heading">Popular Recipes</h4>
+      <ul class="popular-list" id="popular-list">
+        <!-- JS ile doldurulacak -->
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Sağ içerik -->
+  <div class="filter-content">
+    <!-- Filtre barı -->
+    <div class="filters">
+      <div class="filter-group search">
+        <label for="search-input">Search</label>
+        <div class="search-with-icon">
+          <svg
+            class="icon-search-icon"
+            viewBox="0 0 24 24"
+            fill="rgba(5, 5, 5, 0.3)"
+          >
+            <use href="../svg/symbol-defs.svg#icon-search-icon"></use>
+          </svg>
+          <input
+            type="text"
+            placeholder="Enter Text"
+            class="search-input"
+            id="search-input"
+          />
+        </div>
+      </div>
+
+      <div class="filter-group select-time">
+        <label for="time-select">Time</label>
+        <div class="select-with-arrow">
+          <select class="select-filter" id="time-select"></select>
+          <svg
+            class="icon-arrow-down"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(5, 5, 5, 0.3)"
+          >
+            <use href="../svg/symbol-defs.svg#icon-arrow-down"></use>
+          </svg>
+        </div>
+      </div>
+
+      <div class="filter-group select-area">
+        <label for="area-select">Area</label>
+        <div class="select-with-arrow">
+          <select class="select-filter" id="area-select">
+            <!-- JS ile option'lar eklenecek -->
+          </select>
+          <svg
+            class="icon-arrow-down"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(5, 5, 5, 0.3)"
+          >
+            <use href="../svg/symbol-defs.svg#icon-arrow-down"></use>
+          </svg>
+        </div>
+      </div>
+
+      <div class="filter-group select-ingredients">
+        <label for="ingredient-select">Ingredients</label>
+        <div class="select-with-arrow">
+          <select class="select-filter" id="ingredient-select">
+            <!-- JS ile option'lar eklenecek -->
+          </select>
+          <svg
+            class="icon-arrow-down"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(5, 5, 5, 0.3)"
+          >
+            <use href="../svg/symbol-defs.svg#icon-arrow-down"></use>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- HİZALI RESET BUTTON -->
+    <button class="reset-filter" id="reset-button">✖ Reset the filter</button>
+    <!-- Tarif kartları -->
+    <div class="recipe-grid" id="recipe-grid">
+      <!-- JS ile kartlar buraya eklenecek -->
+    </div>
+
+    <div class="empty-recipe-grid" id="empty-recipe-grid"></div>
+
+    <!-- Sayfalama -->
+    <div id="pagination" class="pagination-container"></div>
+    <!-- JS ile sayfa butonları gelecek -->
+  </div>
+</section>
