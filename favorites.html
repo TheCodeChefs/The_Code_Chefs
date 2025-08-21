@@ -4,65 +4,341 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Page 2</title>
-    <link rel="stylesheet" crossorigin href="/The_Code_Chefs/assets/styles-CmdD35BS.css">
+    <title>favorites</title>
+    <script type="module" crossorigin src="/The_Code_Chefs/favorites.js"></script>
+    <link rel="modulepreload" crossorigin href="/The_Code_Chefs/assets/popup_menu-C-lSVEW9.js">
+    <link rel="stylesheet" crossorigin href="/The_Code_Chefs/assets/popup_menu-CltkN2HM.css">
+    <link rel="stylesheet" crossorigin href="/The_Code_Chefs/assets/favorites-6JU65dip.css">
   </head>
   <body>
-    <div class="container">
-  <header class="header">
-    <div class="mobile-menu">
-      <button class="close-button">
-        <svg
-          class="menu-icon"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-        >
-          <use href="../svg/symbol-defs.svg#icon-close-button"></use>
-        </svg>
-      </button>
-    </div>
-    <nav>
-      <a>Home</a>
-      <a>Favorites</a>
-    </nav>
-    <div class="logo">
-      <a>
-        <p><span>tasty</span>treats</p>
-      </a>
-    </div>
-    <div class="icons-area">
-      <button class="basket-button">
-        <svg
-          class="basket-icon"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-        >
-          <use href="../svg/symbol-defs.svg#icon-basket"></use>
-        </svg>
-      </button>
-      <button class="basket-button">
-        <svg
-          class="basket-icon"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-        >
-          <use href="../svg/symbol-defs.svg#icon-hamburger-menu"></use>
-        </svg>
-      </button>
-      <input type="checkbox" class="toggle" id="toggle" />
-      <label for="toggle" class="toggle-label"></label>
-    </div>
-  </header>
-</div>
+    
 
 
     <main>
-      
-      
+      <section class="favorites-hero">
+  <div class="container"></div>
+</section>
+
+<script src="../js/favorites-hero.js" defer></script>
+
+      <section class="favorites-filter">
+  <div class="category-wrapper">
+    <div class="category-fixed">
+      <button id="all-categories-btn" class="category active">
+        All categories
+      </button>
+    </div>
+    <div id="category-scroll" class="category-scroll">
+      <div id="category-list" class="category-list"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="favorites-list" class="favorites-list"></div>
+    <div id="pagination-container" class="pagination"></div>
+
+    <div id="empty-message" class="empty-message hidden">
+      <svg width="80" height="80" aria-hidden="true" focusable="false">
+        <use
+          href="/The_Code_Chefs/assets/icons-8fRWGQL4.svg#icon-elements"
+          xlink:href="/The_Code_Chefs/assets/icons-8fRWGQL4.svg#icon-elements"
+        ></use>
+      </svg>
+      <p>
+        It appears that you haven't added any recipes to your favorites yet. To
+        get started, you can add recipes that you like to your favorites for
+        easier access in the future.
+      </p>
+    </div>
+  </div>
+</section>
+
     </main>
+
+    <!-- Popup: HTML partial -->
+    <!-- Popup Overlay (başta gizli) -->
+<div
+  id="popup-overlay"
+  class="popup-overlay hidden"
+  role="dialog"
+  aria-modal="true"
+>
+  <div id="popup-content" class="popup-content" data-recipe-id="">
+    <!-- Close -->
+    <button type="button" class="popup-x" aria-label="Close">
+      <svg
+        class="icon"
+        viewBox="0 0 32 32"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <use href="../img/icons.svg#icon-close"></use>
+      </svg>
+    </button>
+
+    <div class="div-reverse">
+      <!-- Media -->
+      <div class="media-wrapper">
+        <!-- YouTube -->
+        <div class="video-wrapper hidden" id="pm-video">
+          <!-- svg youtube harici ikonu için buton -->
+          <button
+            id="pm-play-btn"
+            class="yt-center-play"
+            type="button"
+            aria-label="Play"
+          >
+            <svg
+              class="icon"
+              viewBox="0 0 32 32"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <use href="../img/icons.svg#icon-youtube"></use>
+            </svg>
+          </button>
+
+          <!-- Üst şeffaf katman: play/pause toggle -->
+          <button
+            id="pm-click-catcher"
+            class="yt-click-catcher"
+            type="button"
+            aria-label="Toggle video"
+          ></button>
+
+          <iframe
+            class="video-iframe"
+            id="pm-iframe"
+            src=""
+            title="Recipe video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <!-- Resim -->
+        <div class="media-frame hidden" id="pm-image"></div>
+      </div>
+
+      <!-- Başlık -->
+      <h2 class="recipe-title" id="pm-title">Loading…</h2>
+    </div>
+
+    <!-- Meta -->
+    <div class="meta-line">
+      <span class="rating-val" id="pm-rating-val">0.00</span>
+      <span class="star-row" id="pm-stars"></span>
+      <span class="dot"> </span>
+      <span class="cook-time" id="pm-time"></span>
+    </div>
+
+    <!-- Ingredients -->
+    <div class="ingredients" id="pm-ingredients"></div>
+
+    <!-- Tags -->
+    <div class="tags" id="pm-tags"></div>
+
+    <!-- Açıklama -->
+    <div class="recipe-description" id="pm-desc"></div>
+
+    <!-- Aksiyonlar -->
+    <div class="popup-actions">
+      <button class="btn btn-green" id="pm-fav-btn">Add to favorite</button>
+      <button class="btn btn-outline" id="pm-rate-btn">Give a rating</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==== Rating mini modal ==== -->
+<div id="rating-overlay" class="rating-overlay hidden" data-recipe-id="">
+  <div class="rating-card" role="dialog" aria-label="Rate recipe">
+    <button class="rating-x" id="rating-close" aria-label="Close">
+      <svg
+        class="icon"
+        viewBox="0 0 32 32"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <use href="../img/icons.svg#icon-close"></use>
+      </svg>
+    </button>
+
+    <h3 class="rating-title">Rating</h3>
+
+    <div class="rating-row">
+      <span class="rating-value" id="rating-value">0.0</span>
+
+      <div class="rating-stars" id="rating-stars" aria-label="Stars">
+        <!-- 1 -->
+        <div class="star-container" data-star="1">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <defs>
+              <linearGradient
+                id="halfGradient-1"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="50%"></stop>
+                <stop offset="50%"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+              fill="#D6D6D6"
+            />
+          </svg>
+          <button
+            class="half-btn left"
+            data-val="0.5"
+            aria-label="0.5 stars"
+          ></button>
+          <button
+            class="half-btn right"
+            data-val="1"
+            aria-label="1 star"
+          ></button>
+        </div>
+        <!-- 2 -->
+        <div class="star-container" data-star="2">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <defs>
+              <linearGradient
+                id="halfGradient-2"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="50%"></stop>
+                <stop offset="50%"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+              fill="#D6D6D6"
+            />
+          </svg>
+          <button
+            class="half-btn left"
+            data-val="1.5"
+            aria-label="1.5 stars"
+          ></button>
+          <button
+            class="half-btn right"
+            data-val="2"
+            aria-label="2 stars"
+          ></button>
+        </div>
+        <!-- 3 -->
+        <div class="star-container" data-star="3">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <defs>
+              <linearGradient
+                id="halfGradient-3"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="50%"></stop>
+                <stop offset="50%"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+              fill="#D6D6D6"
+            />
+          </svg>
+          <button
+            class="half-btn left"
+            data-val="2.5"
+            aria-label="2.5 stars"
+          ></button>
+          <button
+            class="half-btn right"
+            data-val="3"
+            aria-label="3 stars"
+          ></button>
+        </div>
+        <!-- 4 -->
+        <div class="star-container" data-star="4">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <defs>
+              <linearGradient
+                id="halfGradient-4"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="50%"></stop>
+                <stop offset="50%"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+              fill="#D6D6D6"
+            />
+          </svg>
+          <button
+            class="half-btn left"
+            data-val="3.5"
+            aria-label="3.5 stars"
+          ></button>
+          <button
+            class="half-btn right"
+            data-val="4"
+            aria-label="4 stars"
+          ></button>
+        </div>
+        <!-- 5 -->
+        <div class="star-container" data-star="5">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <defs>
+              <linearGradient
+                id="halfGradient-5"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="50%"></stop>
+                <stop offset="50%"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+              fill="#D6D6D6"
+            />
+          </svg>
+          <button
+            class="half-btn left"
+            data-val="4.5"
+            aria-label="4.5 stars"
+          ></button>
+          <button
+            class="half-btn right"
+            data-val="5"
+            aria-label="5 stars"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <input
+      type="email"
+      id="rating-email"
+      class="rating-email"
+      placeholder="Enter email"
+    />
+
+    <button class="btn rating-send" id="rating-send" disabled>Send</button>
+    <p class="rating-hint" id="rating-hint"></p>
+  </div>
+</div>
+
+
   </body>
 </html>
