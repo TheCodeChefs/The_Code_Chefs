@@ -11,14 +11,68 @@
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
     <script type="module" crossorigin src="/The_Code_Chefs/index.js"></script>
-    <link rel="modulepreload" crossorigin href="/The_Code_Chefs/assets/vendor-CqPP30cW.js">
-    <link rel="modulepreload" crossorigin href="/The_Code_Chefs/assets/popup_menu-fsAcIMqy.js">
+    <link rel="modulepreload" crossorigin href="/The_Code_Chefs/assets/vendor-C5cLWRW_.js">
+    <link rel="modulepreload" crossorigin href="/The_Code_Chefs/assets/popup_menu-Ev2JoY5L.js">
     <link rel="stylesheet" crossorigin href="/The_Code_Chefs/assets/vendor-BH4JZYC6.css">
-    <link rel="stylesheet" crossorigin href="/The_Code_Chefs/assets/popup_menu-DT5wemib.css">
+    <link rel="stylesheet" crossorigin href="/The_Code_Chefs/assets/popup_menu-D53bWylC.css">
   </head>
   <body>
-    
+    <div class="container">
+  <header class="header">
+    <div class="mobile-menu">
+      <button class="close-button">
+        <svg
+          class="menu-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <use href="../svg/symbol-defs.svg#icon-close-button"></use>
+        </svg>
+      </button>
+    </div>
+    <nav class="nav-menu">
+      <a href="/">Home</a>
+      <a href="/favorites">Favorites</a>
+    </nav>
+    <div class="logo">
+      <a>
+        <p><span>tasty</span>treats</p>
+      </a>
+    </div>
+    <div class="icons-area">
+      <button class="basket-button">
+        <svg
+          class="basket-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <use href="/The_Code_Chefs/assets/symbol-defs-DrHRisnP.svg#icon-basket"></use>
+        </svg>
+      </button>
+      <button class="basket-button hamburger-button">
+        <svg
+          class="basket-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <use href="/The_Code_Chefs/assets/symbol-defs-DrHRisnP.svg#icon-hamburger-menu"></use>
+        </svg>
+      </button>
+      <input type="checkbox" class="toggle" id="toggle" />
+      <label for="toggle" class="toggle-label"></label>
+    </div>
+  </header>
+  <script src="./js/header.js"></script>
+</div>
 
 
     <main>
@@ -43,34 +97,34 @@
     <div class="swiper">
       <div class="swiper-wrapper">
         <div class="swiper-slide slide-container">
-          <img class="first-image" src="../img/person-1.png" />
-          <img class="secondary-image" src="../img/plate-food-1.png" />
+          <img class="first-image" src="/The_Code_Chefs/assets/person-1-Cmd3RRSf.png" />
+          <img class="secondary-image" src="/The_Code_Chefs/assets/plate-food-1-BnjmcKn-.png" />
           <p class="main-image-text">
             Grilled, smoky, delicious <br />
             barbecue
           </p>
           <span class="secondary-image-text">Spanish </span>
-          <img class="third-image" src="../img/whole-food-1.png" />
+          <img class="third-image" src="/The_Code_Chefs/assets/whole-food-1-CYHDdRRn.png" />
         </div>
         <div class="swiper-slide slide-container">
-          <img class="first-image" src="../img/person-2.png" />
+          <img class="first-image" src="/The_Code_Chefs/assets/person-2-CNDYYm0G.png" />
           <p class="main-image-text second-main-image-text">
             Hot, cheesy and <br />
             satisfying pizza
           </p>
           <span class="secondary-image-text">Italian </span>
-          <img class="secondary-image" src="../img/plate-food-2.png" />
-          <img class="third-image" src="../img/whole-food-2.png" />
+          <img class="secondary-image" src="/The_Code_Chefs/assets/plate-food-2-Bzz8SmW_.png" />
+          <img class="third-image" src="/The_Code_Chefs/assets/whole-food-2-BVycKB0a.png" />
         </div>
         <div class="swiper-slide slide-container">
-          <img class="first-image" src="../img/person-3.png" />
+          <img class="first-image" src="/The_Code_Chefs/assets/person-3-CUNuX0VU.png" />
           <p class="main-image-text">Fluffy and sweet pancakes</p>
           <span class="secondary-image-text">American </span>
-          <img class="secondary-image" src="../img/plate-food-3.png" />
-          <img class="third-image" src="../img/whole-food-3.png" />
+          <img class="secondary-image" src="/The_Code_Chefs/assets/plate-food-3-CjuvEd9t.png" />
+          <img class="third-image" src="/The_Code_Chefs/assets/whole-food-3-DHs6_jVs.png" />
         </div>
       </div>
-      <div class="swiper-pagination"></div>
+      <div class="swiper-pagination swiper-dots"></div>
     </div>
     <div class="order-now">
       <h5>ORDER NOW</h5>
@@ -80,7 +134,7 @@
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
         >
-          <use href="../svg/symbol-defs.svg#icon-close-button"></use>
+          <use href="/The_Code_Chefs/assets/symbol-defs-DrHRisnP.svg#icon-close-button"></use>
         </svg>
       </button>
       <label class="order-label">Name</label>
