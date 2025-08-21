@@ -1,0 +1,599 @@
+/* === Overlay === */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 5, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 99999;
+}
+.popup-overlay.hidden {
+  display: none;
+}
+
+/* === Card === */
+.popup-content {
+  position: relative;
+  width: 100%;
+  max-width: 335px;
+  height: auto;
+  max-height: 1171px;
+  padding: 40px 20px;
+  overflow: auto;
+  background: var(--background-white);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  overscroll-behavior: contain;
+}
+
+/* Close */
+.popup-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  color: #111;
+}
+.popup-x .icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.popup-x .icon * {
+  stroke: currentColor !important;
+  fill: none !important;
+}
+.popup-x:hover .icon {
+  transform: scale(1.06);
+}
+
+.div-reverse {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+/* ===== Media ===== */
+.media-wrapper {
+  margin: 0;
+  width: 295px;
+  height: 295px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* FOTOĞRAF */
+.media-frame {
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(5, 5, 5, 0.1);
+}
+
+/* VİDEO */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(5, 5, 5, 0.1);
+}
+
+.video-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 0;
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;
+}
+.yt-center-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 30px;
+  height: 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  z-index: 2;
+}
+.yt-center-play .icon {
+  width: 30px;
+  height: 24px;
+  display: block;
+  pointer-events: none;
+}
+.yt-click-catcher {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  display: none;
+}
+.video-wrapper.is-playing .yt-center-play {
+  display: none;
+}
+.video-wrapper.is-playing .yt-click-catcher {
+  display: block;
+}
+
+/* ===== Title & meta ===== */
+.recipe-title {
+  margin: 19px 0 14px;
+  font-size: 18px;
+  font-weight: var(--fw-semibold);
+  line-height: 24px;
+  color: var(--main-black);
+  text-transform: uppercase;
+}
+.meta-line {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  height: 18px;
+  color: rgba(5, 5, 5, 0.5);
+  margin-bottom: 33px;
+}
+.rating-val {
+  display: flex;
+  align-items: center;
+  width: 30px;
+  height: 18px;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0;
+  font-weight: var(--fw-medium);
+}
+.star-row {
+  display: inline-flex;
+  height: 18px;
+  gap: 2px;
+  /* transform: translateY(1px); */
+}
+.star-row .icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* ⭐ Popup menü yıldız renkleri */
+.star-row .star.filled .icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  color: #eea10b;
+}
+.star-row .star.filled .icon * {
+  fill: currentColor;
+  stroke: none;
+}
+.star-row .star.empty .icon {
+  color: #dcdcdc;
+}
+.star-row .star.empty .icon * {
+  fill: currentColor;
+  stroke: none;
+}
+
+.dot {
+  width: 5px;
+  height: 18px;
+}
+.cook-time {
+  display: flex;
+  align-items: center;
+  height: 18px;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0;
+  font-weight: var(--fw-medium);
+}
+
+/* ===== Ingredients ===== */
+.ingredients {
+  background: var(--background-white);
+  padding: 0;
+  margin-bottom: 14px;
+}
+.ing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 15px;
+}
+.ing-name {
+  color: var(--main-black);
+  font-size: 14px;
+  font-weight: var(--fw-regular);
+  line-height: 18px;
+  letter-spacing: 0;
+}
+.ing-measure {
+  color: rgba(5, 5, 5, 0.5);
+  font-size: 14px;
+  font-weight: var(--fw-regular);
+  line-height: 18px;
+  letter-spacing: 0;
+}
+
+/* ===== Tags ===== */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 40px 0 24px;
+}
+.tag-chip {
+  padding: 8px 16px;
+  border: 1px solid rgba(5, 5, 5, 0.2);
+  border-radius: 35px;
+  background: transparent;
+  color: var(--main-black);
+  font-size: 12px;
+  font-weight: var(--fw-medium);
+  line-height: 14px;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+/* ===== Description ===== */
+.recipe-description {
+  width: 295px;
+  white-space: pre-wrap;
+  color: rgba(5, 5, 5, 0.8);
+  font-size: 14px;
+  font-weight: var(--fw-medium);
+  line-height: 18px;
+  letter-spacing: 0;
+  margin: 0 0 40px;
+}
+.recipe-description p {
+  margin: 0;
+}
+
+/* ===== Footer ===== */
+.popup-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+.btn {
+  height: 41px;
+  padding: 12px 24px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: var(--fw-medium);
+  line-height: auto;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-green {
+  background: var(--main-green, #9bb537);
+  color: #fff;
+  border: none;
+}
+.btn-green:hover {
+  color: var(--main-black);
+}
+
+.btn-outline {
+  background: #f8f8f8;
+  border: 2px solid var(--main-green, #9bb537);
+  color: var(--main-black);
+}
+.btn-outline:hover {
+  background: var(--main-green, #9bb537);
+  color: var(--main-black);
+}
+
+/* Helpers */
+.hidden {
+  display: none !important;
+}
+
+/* ==== Rating mini modal ==== */
+.rating-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 12, 12, 0.4);
+  display: grid;
+  place-items: center;
+  z-index: 100000;
+  padding: 16px;
+}
+.rating-card {
+  position: relative;
+  width: 335px;
+  height: 236px;
+  background: var(--background-white);
+  border-radius: 15px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  padding: 20px;
+}
+.rating-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--main-black);
+}
+.rating-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  line-height: 18px;
+  letter-spacing: 0;
+  color: var(--main-black);
+}
+.rating-row {
+  display: flex;
+  align-items: center;
+  width: 161px;
+  height: 24px;
+  gap: 2px;
+  margin: 4px 0 24px;
+}
+.rating-value {
+  font-size: 16px;
+  font-weight: var(--fw-medium);
+  line-height: 24px;
+  letter-spacing: 0;
+  color: var(--main-black);
+  width: 40px;
+  height: 24px;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  width: 128px;
+  height: 24px;
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+}
+.star-container {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin: 0;
+}
+.star-container svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+/* yarım yıldız tıklama alanları */
+.half-btn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.half-btn.left {
+  left: 0;
+}
+.half-btn.right {
+  right: 0;
+}
+
+/* E-posta */
+.rating-email {
+  width: 295px;
+  height: 46px;
+  border-radius: 15px;
+  border: 1px solid rgba(5, 5, 5, 0.2);
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: var(--fw-medium);
+  line-height: 18px;
+  letter-spacing: 0;
+  outline: none;
+  margin-bottom: 14px;
+  background: transparent;
+}
+.rating-email::placeholder {
+  color: rgba(5, 5, 5, 0.5);
+}
+.rating-email.invalid {
+  border-color: #d24a4a;
+}
+
+/* Gönder */
+.btn.rating-send {
+  width: 295px;
+  height: 46px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--main-green);
+  color: #fff;
+  padding: 15px 100px;
+  font-weight: var(--fw-medium);
+  line-height: auto;
+  letter-spacing: 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn.rating-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn.rating-send:hover {
+  color: var(--main-black);
+}
+
+/* Geri bildirim */
+.rating-hint {
+  margin: 8px 2px 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.rating-hint.ok {
+  color: #3b7b1a;
+}
+
+/* YARIM YILDIZ GRADYAN RENGİ — SVG içindeki <stop>’ları boyar */
+.rating-card stop:first-child {
+  stop-color: #eea10b;
+} /* altın */
+.rating-card stop:last-child {
+  stop-color: #dcdcdc;
+} /* gri */
+
+/* ≥768px tablet/desktop */
+@media (min-width: 768px) {
+  .popup-content {
+    max-width: 531px;
+    max-height: 905px;
+    padding: 32px;
+  }
+
+  .popup-x {
+    top: 16px;
+    right: 16px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .popup-x .icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .div-reverse {
+    flex-direction: column-reverse;
+    margin: 0;
+  }
+
+  .media-wrapper {
+    width: 467px;
+    height: 250px;
+  }
+
+  .media-frame,
+  .video-wrapper {
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-iframe {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .rating-title {
+    line-height: 22px;
+    margin: 0 0 16px;
+  }
+
+  .tags {
+    margin: 16px 0;
+    display: inline-flex;
+    width: 258px;
+    height: auto;
+    gap: 4px;
+  }
+
+  .meta-line {
+    margin-bottom: 16px;
+    display: inline-flex;
+    justify-content: flex-end;
+    width: 209px;
+  }
+
+  .ingredients {
+    margin: 0;
+  }
+
+  .recipe-description {
+    width: 467px;
+    margin: 32px 0;
+  }
+
+  .btn {
+    height: 45px;
+    padding: 14px 28px;
+  }
+
+  .rating-card {
+    width: 424px;
+    height: 284px;
+    padding: 32px;
+  }
+
+  .rating-x {
+    top: 16px;
+    right: 16px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .rating-row {
+    margin: 0 0 36px;
+  }
+
+  .rating-email {
+    width: 360px;
+    height: 48px;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .btn.rating-send {
+    width: 360px;
+    height: 48px;
+    padding: 14px 150px;
+  }
+}
