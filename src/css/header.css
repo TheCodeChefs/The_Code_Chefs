@@ -1,0 +1,195 @@
+@media screen and (min-width: 320px) {
+  .container {
+    padding: 0px 20px;
+  }
+  .mobile-menu {
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--main-green);
+    z-index: 2;
+    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  nav {
+    display: none;
+  }
+  .mobile-menu nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .mobile-menu nav a {
+    margin-bottom: 16px;
+    color: var(--background-white);
+  }
+  .close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 32px;
+    border: none;
+    background: none;
+    color: var(--main-white);
+    outline: none;
+  }
+  .toggle {
+    display: none;
+    border: none;
+    background: none;
+    width: 0;
+    height: 0;
+  }
+  .toggle-label {
+    visibility: hidden;
+    width: 46px;
+    height: 20px;
+    display: block;
+    background: #cecdcd;
+    border-radius: 200px;
+  }
+  .toggle-label::after {
+    display: none;
+    content: '';
+    width: 19px;
+    height: 19px;
+    background-color: var(--background-white);
+    border-radius: 200px;
+    transition: all 0.3s ease-in-out;
+    z-index: 5;
+  }
+  header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0px;
+  }
+  .logo {
+    font-weight: var(--fw-semibold);
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  .logo span {
+    color: var(--main-green);
+  }
+  .basket-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+  }
+  .basket-button svg {
+    width: 24px;
+    height: 24px;
+    color: var(--main-green);
+  }
+  .toggle.show,
+  .toggle-label.show {
+    display: block;
+    visibility: visible;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 999;
+  }
+}
+@media screen and (min-width: 768px) {
+  header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0px;
+  }
+  .logo {
+    font-weight: var(--fw-semibold);
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  .logo span {
+    color: var(--main-green);
+  }
+  .icons-area {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .icons-area :nth-child(2) {
+    display: none;
+  }
+  .basket-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+  }
+  .basket-button svg {
+    width: 24px;
+    height: 24px;
+    color: var(--background-black);
+  }
+  .toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: block;
+    visibility: visible;
+    border: none;
+    background: none;
+    width: 0;
+    height: 0;
+  }
+  .toggle-label {
+    display: block;
+    visibility: visible;
+    width: 46px;
+    height: 20px;
+    background: #cecdcd;
+    border-radius: 200px;
+  }
+  .toggle-label::after {
+    display: block;
+    visibility: visible;
+    content: '';
+    width: 19px;
+    height: 19px;
+    background-color: var(--background-white);
+    border-radius: 200px;
+    transition: all 0.3s ease-in-out;
+    z-index: 5;
+  }
+  .close-button {
+    display: none;
+  }
+  .mobile-menu {
+    display: none;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--fw-medium);
+    font-size: 12px;
+    gap: 16px;
+  }
+  nav a {
+    color: var(--main-black);
+    text-decoration: none;
+  }
+  nav a:hover,
+  :active {
+    color: var(--main-green);
+    transition: color 0.3s ease-in-out;
+  }
+}
+header {
+  max-width: 1200px;
+  margin: 0 auto;
+}

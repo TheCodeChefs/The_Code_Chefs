@@ -1,0 +1,206 @@
+@media screen and (min-width: 320px) {
+  .container {
+    padding: 0px 20px;
+  }
+  .swiper {
+    width: 100%;
+  }
+  .slide-container {
+    display: flex !important;
+    box-sizing: border-box;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+  }
+  .first-image {
+    width: 80px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-right: 8px;
+  }
+  .secondary-image {
+    width: 200px;
+    height: 280px;
+    object-fit: contain;
+    border-radius: 15px;
+    margin-right: 8px;
+  }
+  .third-image {
+    width: 200px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-right: 8px;
+  }
+  .swiper-slide img {
+    background-color: var(--main-black);
+  }
+  .main-image-text {
+    position: absolute;
+    bottom: 23px;
+    left: 115px;
+    color: var(--background-white);
+    font-size: 10px;
+    line-height: 1.4;
+    text-align: center;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    color: rgba(248, 248, 248, 0.6);
+  }
+  .secondary-image-text {
+    position: absolute;
+    bottom: 10px;
+    left: 164px;
+    color: var(--background-white);
+    font-size: 8px;
+    line-height: 1.4;
+    text-align: center;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    color: rgba(248, 248, 248, 0.2);
+  }
+  .second-main-image-text {
+    left: 136px;
+  }
+  h1 {
+    margin-top: 70px;
+    margin-bottom: 14px;
+    font-size: 26px;
+    line-height: 1.2;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+  h1 span {
+    color: var(--main-green);
+  }
+  h4 {
+    margin-bottom: 28px;
+  }
+  .order-now-button {
+    margin-bottom: 48px;
+  }
+  .order-now h5 {
+    font-weight: var(--fw-semibold);
+    font-size: 18px;
+    line-height: 1.2;
+    color: var(--main-black);
+    margin-bottom: 28px;
+  }
+  .order-now {
+    display: none;
+    width: 335px;
+    background-color: var(--background-white);
+    color: var(--main-black);
+    padding: 28px 20px;
+    z-index: 10;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    border-radius: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+  }
+  .order-label {
+    font-weight: var(--fw-semibold);
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--main-black);
+    opacity: 50%;
+  }
+  .order-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 15px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+  .order-textarea {
+    height: 84px;
+  }
+  .order-button {
+    width: 100%;
+    color: var(--background-white);
+  }
+  .order-now-close-button {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+  }
+  .show-order-now {
+    display: block;
+  }
+}
+@media screen and (min-width: 768px) {
+  .first-image {
+    width: 137px;
+    height: 442px;
+  }
+  .secondary-image {
+    width: 350px;
+    height: 442px;
+  }
+  .third-image {
+    width: 350px;
+    height: 442px;
+  }
+  .home-header-area {
+    width: 446px;
+  }
+  h1 {
+    font-size: 36px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  h4 {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+  .order-now-button {
+    margin-top: 32px;
+  }
+  .order-now {
+    width: 440px;
+    padding: 40px 40px;
+  }
+  .order-now-close-button {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: block;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .home-hero-container {
+    margin-top: 100px;
+    display: flex;
+    padding: 0 20px;
+  }
+  .swiper {
+    width: 728px;
+  }
+  .first-image {
+    width: 137px;
+    height: 442px;
+  }
+  .secondary-image {
+    width: 350px;
+    height: 442px;
+  }
+  .third-image {
+    width: 350px;
+    height: 442px;
+  }
+  .order-now-close-button {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: block;
+  }
+}
