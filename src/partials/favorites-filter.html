@@ -1,0 +1,31 @@
+<section class="favorites-filter">
+  <div class="category-wrapper">
+    <div class="category-fixed">
+      <button id="all-categories-btn" class="category active">
+        All categories
+      </button>
+    </div>
+    <div id="category-scroll" class="category-scroll">
+      <div id="category-list" class="category-list"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="favorites-list" class="favorites-list"></div>
+    <div id="pagination-container" class="pagination"></div>
+
+    <div id="empty-message" class="empty-message hidden">
+      <svg width="80" height="80" aria-hidden="true" focusable="false">
+        <use
+          href="./img/icons.svg#icon-elements"
+          xlink:href="./img/icons.svg#icon-elements"
+        ></use>
+      </svg>
+      <p>
+        It appears that you haven't added any recipes to your favorites yet. To
+        get started, you can add recipes that you like to your favorites for
+        easier access in the future.
+      </p>
+    </div>
+  </div>
+</section>
