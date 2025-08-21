@@ -1,512 +1,458 @@
-// popup_menu.js — API + YouTube + ingredients map + rating modal (half-stars + diagnostic sending)
-console.log('✅ popup_menu.js yüklendi');
+// js/popup_menu.js — favori toggle + rating + detay fetch + responsive düzen
+const API_ROOT = 'https://tasty-treats-backend.p.goit.global/api';
+
 import { toggleFavorite } from './home-filter.js';
 
-(function () {
-  const API_ROOT = 'https://tasty-treats-backend.p.goit.global/api';
+/* ===== Helpers ===== */
+const qs = (s, p = document) => p.querySelector(s);
+const qsa = (s, p = document) => [...p.querySelectorAll(s)];
+const show = el => el && el.classList.remove('hidden');
+const hide = el => el && el.classList.add('hidden');
+const esc = s =>
+  (s ?? '').toString().replace(
+    /[&<>"']/g,
+    m =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[m])
+  );
+const format2Trunc = v => {
+  const n = Number.parseFloat(String(v ?? '').replace(',', '.'));
+  if (!Number.isFinite(n)) return '0.00';
+  const t = Math.trunc(n * 100) / 100;
+  return t.toFixed(2);
+};
 
-  /* ========== LocalStorage (favorites) ========== */
-  const FAV_KEY = 'favorites';
-  const getFavs = () => {
-    try {
-      return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
-    } catch {
-      return [];
-    }
-  };
-  const setFavs = list => localStorage.setItem(FAV_KEY, JSON.stringify(list));
-  const inFavs = id => getFavs().some(r => r && (r._id === id || r.id === id));
+/* ===== Sprite helper (yıldızlar için) ===== */
+const SPRITE_PATH = '../img/icons.svg';
+function svgIcon(name, className = '') {
+  return `<svg class="icon ${className}" aria-hidden="true" focusable="false">
+    <use href="${SPRITE_PATH}#icon-${name}"></use>
+  </svg>`;
+}
 
-  /* ========== Cache & fetch helpers ========== */
-  const cache = { ingredientsMap: null, recipes: new Map() };
-  const fetchJSON = async url => {
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-    return r.json();
-  };
-
-  async function getIngredientsMap() {
-    if (cache.ingredientsMap) return cache.ingredientsMap;
-    const list = await fetchJSON(`${API_ROOT}/ingredients`);
-    const map = new Map();
-    (list || []).forEach(it => {
-      const id = it._id || it.id;
-      const name = it.ttl || it.title || it.name || it.ingredient || '';
-      map.set(id, { id, name });
-    });
-    cache.ingredientsMap = map;
-    return map;
-  }
-
-  async function getRecipeDetail(id) {
-    if (cache.recipes.has(id)) return cache.recipes.get(id);
-    const data = await fetchJSON(`${API_ROOT}/recipes/${id}`);
-    cache.recipes.set(id, data);
-    return data;
-  }
-
-  /* ========== Utils ========== */
-  const esc = s =>
-    (s ?? '').toString().replace(
-      /[&<>"']/g,
-      m =>
-        ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;',
-        }[m])
-    );
-  const starFilled = `<svg class="star" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
-  const starEmpty = `<svg class="star empty" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24zm-10 6.11l-3.76 2.27 1-4.28L5.5 10.5l4.38-.38L12 6.1l2.12 4.02 4.38.38-3.74 3.84 1 4.28L12 15.35z"/></svg>`;
-  const renderStars = (r = 0) =>
-    `<span class="star-row">${starFilled.repeat(
-      Math.min(5, Math.max(0, Math.floor(+r || 0)))
-    )}${starEmpty.repeat(
-      5 - Math.min(5, Math.max(0, Math.floor(+r || 0)))
-    )}</span>`;
-  const getRecipeId = recipe => String(recipe?._id || recipe?.id || '');
-
-  // ingredient helpers (şema dayanıklı)
-  const pickName = (it, map) => {
-    if (!it) return '';
-    if (typeof it === 'string') return it;
-    const viaMap = map?.get?.(it.id || it._id);
-    return (
-      it.name ??
-      it.title ??
-      viaMap?.name ??
-      it.ingredient ??
-      it.product ??
-      it.description ??
-      it.item ??
-      ''
-    );
-  };
-  const pickMeasure = it => {
-    if (!it || typeof it === 'string') return '';
-    if (typeof it.measure === 'string') return it.measure;
-    const q =
-      it.quantity ?? it.qty ?? it.amount ?? it.value ?? it.count ?? it.number;
-    const u =
-      it.unit ?? it.unitShort ?? it.unitLong ?? it.measureUnit ?? it.units;
-    if (q || u) return [q, u].filter(Boolean).join(' ');
-    if (it.measure && typeof it.measure === 'object') {
-      const mq = it.measure.quantity ?? it.measure.amount ?? it.measure.value;
-      const mu = it.measure.unit ?? it.measure.unitShort ?? it.measure.units;
-      if (mq || mu) return [mq, mu].filter(Boolean).join(' ');
-    }
-    if (it.measures?.metric) {
-      const m = it.measures.metric;
-      const mq = m.amount ?? m.quantity ?? m.value;
-      const mu = m.unitShort ?? m.unit;
-      if (mq || mu) return [mq, mu].filter(Boolean).join(' ');
-    }
-    return '';
-  };
-  const normalizeIngredients = recipe => {
-    if (Array.isArray(recipe?.ingredients)) return recipe.ingredients;
-    if (typeof recipe?.ingredients === 'string') {
-      return recipe.ingredients
-        .split('\n')
-        .map(s => s.trim())
-        .filter(Boolean)
-        .map(s => ({ name: s }));
-    }
-    if (Array.isArray(recipe?.components)) return recipe.components;
-    if (Array.isArray(recipe?.extendedIngredients))
-      return recipe.extendedIngredients;
+/* ===== Favorites (localStorage: OBJE DİZİSİ) ===== */
+function getFavorites() {
+  try {
+    const v = JSON.parse(localStorage.getItem('favorites'));
+    return Array.isArray(v) ? v : [];
+  } catch {
     return [];
-  };
-
-  // YouTube helpers
-  function extractYouTubeId(urlOrId = '') {
-    const s = String(urlOrId).trim();
-    if (!s) return '';
-    if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
-    const m =
-      s.match(
-        /(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-      ) || s.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-    return m ? m[1] : '';
   }
-  function youtubeEmbedUrl(recipe) {
-    const raw =
-      recipe?.youtube ||
-      recipe?.video ||
-      recipe?.youtubeUrl ||
-      recipe?.youtubeLink ||
-      recipe?.yt ||
+}
+function setFavorites(arr) {
+  localStorage.setItem('favorites', JSON.stringify(arr || []));
+  window.dispatchEvent(new Event('favorites:updated'));
+}
+function getIdSafe(obj) {
+  return obj?._id || obj?.id || obj?.recipeId || '';
+}
+function findIndexById(list, id) {
+  const key = String(id);
+  return (list || []).findIndex(r => String(getIdSafe(r)) === key);
+}
+function isFavorite(id) {
+  return findIndexById(getFavorites(), id) !== -1;
+}
+function makeFavoritePayload(src) {
+  const id = getIdSafe(src);
+  const title = src?.title || '';
+  const description = src?.description || '';
+  const rating = Number(src?.rating) || 0;
+  const preview =
+    src?.preview || src?.thumb || src?.image_url || src?.imageUrl || '';
+  let category = src?.category;
+  if (!category) category = src?.category?.name || src?.categoryName || '';
+  const categoryObj =
+    typeof category === 'string' ? { name: category } : category || {};
+  return {
+    ...src,
+    _id: id,
+    title,
+    description,
+    rating,
+    preview,
+    category: categoryObj,
+  };
+}
+function toggleFavoriteById(id, recipeObjForAdd) {
+  const list = getFavorites();
+  const idx = findIndexById(list, id);
+  toggleFavorite(recipeObjForAdd, true);
+  if (idx !== -1) {
+    list.splice(idx, 1);
+    setFavorites(list);
+    return false;
+  }
+  const payload = makeFavoritePayload(recipeObjForAdd || { _id: id });
+  list.unshift(payload);
+  setFavorites(list);
+  return true;
+}
+
+/* ===== Global durum ===== */
+let currentRecipe = null;
+let currentRating = 0;
+window.__currentRecipeId = '';
+
+/* ===== Refs ===== */
+function refs() {
+  return {
+    overlay: qs('#popup-overlay'),
+    content: qs('#popup-content'),
+    pmVideo: qs('#pm-video'),
+    pmIframe: qs('#pm-iframe'),
+    pmImage: qs('#pm-image'),
+    pmTitle: qs('#pm-title'),
+    pmRatingVal: qs('#pm-rating-val'),
+    pmStars: qs('#pm-stars'),
+    pmTime: qs('#pm-time'),
+    pmIngredients: qs('#pm-ingredients'),
+    pmTags: qs('#pm-tags'),
+    pmDesc: qs('#pm-desc'),
+    favBtn: qs('#pm-fav-btn'),
+    rateBtn: qs('#pm-rate-btn'),
+    ratingOverlay: qs('#rating-overlay'),
+    ratingStars: qs('#rating-stars'),
+    ratingValueEl: qs('#rating-value'),
+    ratingEmail: qs('#rating-email'),
+    ratingSend: qs('#rating-send'),
+    ratingHint: qs('#rating-hint'),
+    playBtn: qs('#pm-play-btn'),
+    clickCatcher: qs('#pm-click-catcher'),
+  };
+}
+
+/* ===== Yıldızlar (popup başlığı altındaki statik gösterim) ===== */
+const starFilledHTML = `<span class="star filled">${svgIcon('Star')}</span>`;
+const starEmptyHTML = `<span class="star empty">${svgIcon(
+  'Star-empty'
+)}</span>`;
+function renderStaticStars(container, val) {
+  if (!container) return;
+  const n = Number.parseFloat(String(val ?? '').replace(',', '.'));
+  const rating = Number.isFinite(n) ? n : 0;
+  const full = Math.max(0, Math.min(5, Math.floor(rating)));
+  const empty = 5 - full;
+  container.innerHTML = `<span class="star-row">
+    ${starFilledHTML.repeat(full)}${starEmptyHTML.repeat(empty)}
+  </span>`;
+}
+
+/* ===== Rating modal yıldız boyama ===== */
+function clearRatingStars(starsRoot) {
+  if (!starsRoot) return;
+  qsa('svg path', starsRoot).forEach(p => p.setAttribute('fill', '#dcdcdc'));
+}
+function paintRatingStars(starsRoot, val) {
+  if (!starsRoot) return;
+  clearRatingStars(starsRoot);
+  const full = Math.floor(val);
+  const half = val % 1 >= 0.5;
+  qsa('.star-container', starsRoot).forEach((c, idx) => {
+    const num = idx + 1;
+    const path = qs('path', c);
+    if (!path) return;
+    if (num <= full) path.setAttribute('fill', '#eea10b');
+    else if (num === full + 1 && half)
+      path.setAttribute('fill', `url(#halfGradient-${num})`);
+  });
+}
+function validateRatingForm(r) {
+  const email = r.ratingEmail?.value.trim() || '';
+  const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const ok = currentRating > 0 && okEmail;
+  if (r.ratingSend) r.ratingSend.disabled = !ok;
+  if (r.ratingHint)
+    r.ratingHint.textContent = ok ? '' : 'Enter valid email and select rating.';
+}
+
+/* ===== Tablet/desktop yerleşimi: tags + meta aynı satır ===== */
+let __topRowInserted = false;
+const BREAKPOINT = 780;
+
+function ensureTopRow() {
+  const r = refs();
+  if (!r.content) return;
+
+  // yerleştirme noktaları
+  const ingredientsEl = r.pmIngredients;
+  const tagsEl = r.pmTags;
+  const metaEl = qs('.meta-line', r.content);
+
+  if (!tagsEl || !metaEl) return;
+
+  if (window.innerWidth >= BREAKPOINT) {
+    if (!__topRowInserted) {
+      const top = document.createElement('div');
+      top.className = 'top-row';
+      // ingredients'tan önce göstermek için:
+      r.content.insertBefore(top, ingredientsEl);
+      top.appendChild(tagsEl);
+      top.appendChild(metaEl);
+      __topRowInserted = true;
+    }
+  } else {
+    // mobilde özgün akışa geri dön
+    if (__topRowInserted) {
+      // meta eski yerinde zaten ingredients'tan önceydi; ingredients'tan sonra tags vardı.
+      r.content.insertBefore(metaEl, ingredientsEl); // meta ingredients'ın üstünde kalsın
+      r.content.insertBefore(tagsEl, r.pmDesc); // tags tekrar description'dan önce
+      const top = qs('.top-row', r.content);
+      top && top.remove();
+      __topRowInserted = false;
+    }
+  }
+}
+
+/* ===== renderDetails: popup alanlarını doldurur ===== */
+function renderDetails(recipe) {
+  const r = refs();
+  if (!r.content) return;
+
+  const id = String(recipe._id || recipe.id || '');
+  if (id) {
+    r.content.dataset.recipeId = id;
+    if (r.ratingOverlay) r.ratingOverlay.dataset.recipeId = id;
+    window.__currentRecipeId = id;
+  }
+
+  if (r.pmTitle) r.pmTitle.textContent = recipe.title || 'Untitled';
+  if (r.pmRatingVal) r.pmRatingVal.textContent = format2Trunc(recipe.rating);
+  renderStaticStars(r.pmStars, recipe.rating || 0);
+  if (r.pmTime) r.pmTime.textContent = recipe.time ? recipe.time + ' min' : '';
+
+  const yt = recipe.youtube || recipe.youtubeUrl || '';
+  if (yt) {
+    show(r.pmVideo);
+    hide(r.pmImage);
+    const vid = yt.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\b|&|$)/)?.[1] || yt;
+    if (r.pmIframe) {
+      r.pmIframe.src = `https://www.youtube.com/embed/${vid}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1`;
+    }
+  } else {
+    hide(r.pmVideo);
+    show(r.pmImage);
+    const img =
+      recipe.image_url ||
+      recipe.imageUrl ||
+      recipe.preview ||
+      recipe.thumb ||
       '';
-    const id = extractYouTubeId(raw);
-    return id
-      ? `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`
-      : '';
+    if (r.pmImage)
+      r.pmImage.style.backgroundImage = img ? `url('${esc(img)}')` : '';
   }
 
-  // ESC leak guard
-  window.__pmEscHandler = window.__pmEscHandler || null;
-
-  /* ========== PUBLIC: openPopup ========== */
-  window.openPopup = async function (recipeOrId) {
-    const overlay = document.getElementById('home-filter-popup-overlay');
-    const content = document.getElementById('home-filter-popup-content');
-    if (!overlay || !content)
-      return console.error('❌ #popup-overlay/#popup-content yok.');
-
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
-
-    // local veri ile iskelet
-    let recipe =
-      typeof recipeOrId === 'object'
-        ? recipeOrId
-        : getFavs().find(r => getRecipeId(r) === String(recipeOrId)) || {
-            _id: recipeOrId,
-          };
-    renderSkeleton(content, recipe);
-    overlay.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-
-    try {
-      const id = getRecipeId(recipe);
-      const [detail, map] = await Promise.all([
-        id ? getRecipeDetail(id) : Promise.resolve(null),
-        getIngredientsMap(),
-      ]);
-      recipe = { ...recipe, ...(detail || {}) };
-      renderFull(content, overlay, recipe, map);
-    } catch (err) {
-      console.error('Popup fetch error:', err);
-      content.innerHTML = errorView(err);
-      bindClose(overlay);
-    }
-  };
-
-  /* ========== PUBLIC: closePopup ========== */
-  window.closePopup = function () {
-    const overlay = document.getElementById('home-filter-popup-overlay');
-    if (!overlay) return;
-    overlay.classList.add('hidden');
-    document.body.style.overflow = '';
-    if (window.__pmEscHandler) {
-      document.removeEventListener('keydown', window.__pmEscHandler);
-      window.__pmEscHandler = null;
-    }
-  };
-
-  /* ========== Views ========== */
-  function mediaHTML(recipe) {
-    const yt = youtubeEmbedUrl(recipe);
-    if (yt) {
-      return `
-        <div class="video-wrapper">
-          <iframe class="video-iframe" src="${yt}" title="Recipe video" frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen></iframe>
-        </div>`;
-    }
-    return `<div class="media-frame" style="background-image:url('${esc(
-      recipe?.preview || recipe?.thumb || ''
-    )}')"></div>`;
+  if (r.pmIngredients) {
+    r.pmIngredients.innerHTML = '';
+    (recipe.ingredients || []).forEach(it => {
+      const name = typeof it === 'string' ? it : it?.name || '';
+      const measure = typeof it === 'string' ? '' : it?.measure || '';
+      const row = document.createElement('div');
+      row.className = 'ing-row';
+      row.innerHTML = `<span class="ing-name">${name}</span><span class="ing-measure">${measure}</span>`;
+      r.pmIngredients.appendChild(row);
+    });
   }
 
-  function renderSkeleton(content, recipe) {
-    content.innerHTML = `
-      <button class="popup-x" type="button" aria-label="Close">×</button>
-      <div class="media-wrapper"><div class="media-frame sk-bg"></div></div>
-      <h2 class="recipe-title">${esc(recipe?.title || 'Loading...')}</h2>
-      <div class="meta-line sk-line" style="height:16px;width:160px;"></div>
-      <div class="ingredients">
-        ${['', '', '', '', '']
-          .map(
-            () =>
-              `<div class="ing-row"><span class="ing-name sk-line" style="width:60%"></span><span class="ing-measure sk-line" style="width:20%"></span></div>`
-          )
-          .join('')}
-      </div>
-      <div class="tags">${['', '', '']
-        .map(
-          () =>
-            `<span class="tag-chip sk-line" style="width:90px;height:28px;"></span>`
-        )
-        .join('')}</div>
-      <div class="recipe-description sk-block" style="height:90px"></div>
-      <div class="popup-actions">
-        <button class="btn btn-green" disabled>…</button>
-        <button class="btn btn-outline" disabled>…</button>
-      </div>`;
-    bindClose(document.getElementById('home-filter-popup-overlay'));
+  if (r.pmTags) {
+    r.pmTags.innerHTML = '';
+    (recipe.tags || []).forEach(tag => {
+      const span = document.createElement('span');
+      span.className = 'tag-chip';
+      span.textContent = `#${tag}`;
+      r.pmTags.appendChild(span);
+    });
   }
 
-  function renderFull(content, overlay, recipe, ingredientsMap) {
-    const timeText = recipe?.time?.minutes ?? recipe?.time ?? '';
-    const tagsHTML = (recipe?.tags || [])
-      .map(t => `<span class="tag-chip">#${esc(t)}</span>`)
-      .join('');
-
-    const ingList = normalizeIngredients(recipe);
-    const ingredientsHTML = ingList
-      .map(it => {
-        const name = pickName(it, ingredientsMap);
-        const meas = pickMeasure(it);
-        return `<div class="ing-row"><span class="ing-name">${esc(
-          name
-        )}</span><span class="ing-measure">${esc(meas)}</span></div>`;
-      })
-      .join('');
-
-    const favInitial = inFavs(getRecipeId(recipe))
-      ? 'Remove from favorite'
+  if (r.pmDesc) r.pmDesc.textContent = recipe.description || '';
+  if (r.favBtn && id)
+    r.favBtn.textContent = isFavorite(id)
+      ? 'Remove favorite'
       : 'Add to favorite';
 
-    content.innerHTML = `
-      <button class="popup-x" type="button" aria-label="Close">×</button>
+  // geniş ekranda üst satırı kur
+  ensureTopRow();
+}
 
-      <div class="media-wrapper">
-        ${mediaHTML(recipe)}
-      </div>
+function syncFavBtnText() {
+  const r = refs();
+  const id = r.content?.dataset?.recipeId || window.__currentRecipeId || '';
+  if (!r.favBtn || !id) return;
+  r.favBtn.textContent = isFavorite(id) ? 'Remove favorite' : 'Add to favorite';
+}
 
-      <h2 class="recipe-title">${esc(recipe?.title || 'Untitled')}</h2>
+/* ============ GLOBAL: openPopup ============ */
+window.openPopup = async function openPopup(recipeOrId) {
+  const r = refs();
+  if (!r.overlay) return;
 
-      <div class="meta-line">
-        <span class="rating-val">${(Number(recipe?.rating) || 0).toFixed(
-          1
-        )}</span>
-        ${renderStars(recipe?.rating)}
-        ${
-          timeText
-            ? `<span class="dot">•</span><span class="cook-time">${esc(
-                timeText
-              )} min</span>`
-            : ''
-        }
-      </div>
+  // body scroll kilidi
+  document.documentElement.style.overflow = 'hidden';
 
-      <div class="ingredients">
-        ${
-          ingredientsHTML ||
-          `<div class="ing-row"><span class="ing-name">Ingredients</span><span class="ing-measure">N/A</span></div>`
-        }
-      </div>
-
-      <div class="tags">${tagsHTML}</div>
-
-      <div class="recipe-description">
-        ${esc(recipe?.description || recipe?.instructions || '')}
-      </div>
-
-      <div class="popup-actions">
-        <button class="btn btn-green" id="pm-fav-btn">${favInitial}</button>
-        <button class="btn btn-outline" id="pm-rate-btn">Give a rating</button>
-      </div>
-    `;
-
-    bindClose(overlay);
-
-    // favorites
-    content.querySelector('#pm-fav-btn').addEventListener('click', () => {
-      const list = getFavs();
-      const id = getRecipeId(recipe);
-      toggleFavorite(recipe, true);
-      if (inFavs(id)) {
-        setFavs(list.filter(r => getRecipeId(r) !== id));
-        content.querySelector('#pm-fav-btn').textContent = 'Add to favorite';
-      } else {
-        setFavs([{ ...recipe }, ...list]);
-        content.querySelector('#pm-fav-btn').textContent =
-          'Remove from favorite';
-      }
-    });
-
-    // rating modal trigger
-    content.querySelector('#pm-rate-btn').addEventListener('click', () => {
-      openRatingModal(recipe);
-    });
+  if (typeof recipeOrId === 'object' && recipeOrId) {
+    currentRecipe = recipeOrId;
+  } else {
+    const idStr = String(recipeOrId ?? '');
+    currentRecipe = { _id: idStr };
   }
 
-  function errorView(err) {
-    return `
-      <button class="popup-x" type="button" aria-label="Close" onclick="closePopup()">×</button>
-      <div style="padding:12px">
-        <h3 style="margin:8px 0;color:#b00020">Failed to load recipe</h3>
-        <p style="color:#666;font-size:14px;">${esc(
-          err?.message || 'Unknown error'
-        )}</p>
-      </div>`;
-  }
+  renderDetails(currentRecipe);
+  show(r.overlay);
+  syncFavBtnText();
 
-  function bindClose(overlay) {
-    const x = document.querySelector('.popup-x');
-    if (x) x.onclick = () => window.closePopup();
-    overlay.onclick = e => {
-      if (e.target === overlay) window.closePopup();
-    };
-    if (window.__pmEscHandler)
-      document.removeEventListener('keydown', window.__pmEscHandler);
-    window.__pmEscHandler = ev => {
-      if (ev.key === 'Escape') window.closePopup();
-    };
-    document.addEventListener('keydown', window.__pmEscHandler);
-  }
-
-  /* ========== Rating send (diagnostic) ========== */
-  async function sendRecipeRating(recipe, value, email) {
-    const recipeId = getRecipeId(recipe);
-    if (!recipeId) throw new Error('Missing recipe id');
-
-    const url = `${API_ROOT}/recipes/${recipeId}/rating`;
-    const payload = { rate: Number(value) }; // backend 0.5 destekliyorsa böyle bırak
-    if (email) payload.email = email;
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-      mode: 'cors',
-      cache: 'no-store',
-    });
-
-    let bodyText = '';
-    try {
-      bodyText = await res.clone().text();
-    } catch {}
-    console.groupCollapsed('[rating] response');
-    console.log('URL:', url);
-    console.log('Status:', res.status, res.statusText);
-    console.log('Headers:', Object.fromEntries(res.headers.entries()));
-    console.log('Body:', bodyText);
-    console.groupEnd();
-
-    if (!res.ok) {
-      try {
-        const data = JSON.parse(bodyText || '{}');
-        throw new Error(data.message || `${res.status} ${res.statusText}`);
-      } catch {
-        throw new Error(bodyText || `${res.status} ${res.statusText}`);
-      }
+  const id = String(currentRecipe._id || currentRecipe.id || '');
+  if (!id) return;
+  try {
+    const res = await fetch(`${API_ROOT}/recipes/${encodeURIComponent(id)}`);
+    if (res.ok) {
+      const fresh = await res.json();
+      currentRecipe = { ...currentRecipe, ...fresh };
+      renderDetails(currentRecipe);
+      syncFavBtnText();
     }
+  } catch {}
+};
 
-    try {
-      return JSON.parse(bodyText || '{}');
-    } catch {
-      return {};
-    }
+/* ======= Event listeners (popup, fav, rating vs.) ======= */
+document.addEventListener('click', e => {
+  const r = refs();
+  if (e.target.closest('.popup-x') || (r.overlay && e.target === r.overlay)) {
+    hide(r.overlay);
+    document.documentElement.style.overflow = ''; // scroll kilidini aç
+    if (r.pmIframe) r.pmIframe.src = '';
   }
-
-  /* ========== Rating mini-modal (half-stars) ========== */
-  function openRatingModal(recipe) {
-    const content = document.getElementById('home-filter-popup-content');
-    if (!content) return;
-
-    const prev = content.querySelector('.rating-overlay');
-    if (prev) prev.remove();
-
-    const tpl = document.createElement('div');
-    tpl.className = 'rating-overlay';
-    tpl.innerHTML = `
-      <div class="rating-card" role="dialog" aria-label="Rate recipe">
-        <button class="rating-x" type="button" aria-label="Close">×</button>
-        <h3 class="rating-title">Rating</h3>
-        <div class="rating-row">
-          <span class="rating-value">0.0</span>
-          <div class="rating-stars" aria-label="Stars">
-            ${[1, 2, 3, 4, 5]
-              .map(
-                i => `
-              <div class="star-container" data-star="${i}">
-                <button class="half-btn left"  data-val="${
-                  i - 1 + 0.5
-                }" aria-label="${i - 0.5} stars"></button>
-                <button class="half-btn right" data-val="${i}" aria-label="${i} stars"></button>
-                <svg viewBox="0 0 24 24" width="28" height="28">
-                  <defs>
-                    <linearGradient id="halfGradient-${i}" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="50%" stop-color="#FFC107"></stop>
-                      <stop offset="50%" stop-color="#D6D6D6"></stop>
-                    </linearGradient>
-                  </defs>
-                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="#D6D6D6"/>
-                </svg>
-              </div>
-            `
-              )
-              .join('')}
-          </div>
-        </div>
-
-        <label class="rating-label">
-          <input type="email" class="rating-email" placeholder="Enter email" />
-        </label>
-
-        <button class="btn rating-send" disabled>Send</button>
-        <p class="rating-hint"></p>
-      </div>
-    `;
-    content.appendChild(tpl);
-
-    const card = tpl.querySelector('.rating-card');
-    const xBtn = card.querySelector('.rating-x');
-    const emailI = card.querySelector('.rating-email');
-    const sendB = card.querySelector('.rating-send');
-    const starsC = card.querySelector('.rating-stars');
-    const valueL = card.querySelector('.rating-value');
-    const hint = card.querySelector('.rating-hint');
-
-    let current = 0;
-    const validEmail = (s = '') => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-
-    const paint = n => {
-      current = n;
-      valueL.textContent = n.toFixed(1);
-      card.querySelectorAll('.star-container').forEach(cont => {
-        const starNum = Number(cont.dataset.star);
-        const path = cont.querySelector('svg path');
-        if (n >= starNum) {
-          path.setAttribute('fill', '#FFC107'); // full
-        } else if (n >= starNum - 0.5) {
-          path.setAttribute('fill', `url(#halfGradient-${starNum})`); // half
-        } else {
-          path.setAttribute('fill', '#D6D6D6'); // empty
-        }
-      });
-      sendB.disabled = !(current && validEmail(emailI.value));
-    };
-
-    starsC.addEventListener('click', e => {
-      const btn = e.target.closest('.half-btn');
-      if (!btn) return;
-      paint(Number(btn.dataset.val));
-    });
-
-    emailI.addEventListener('input', () => {
-      sendB.disabled = !(current && validEmail(emailI.value));
-    });
-
-    xBtn.onclick = () => tpl.remove();
-    tpl.addEventListener('click', e => {
-      if (e.target === tpl) tpl.remove();
-    });
-
-    sendB.addEventListener('click', async () => {
-      hint.textContent = '';
-      sendB.disabled = true;
-      try {
-        await sendRecipeRating(recipe, current, emailI.value.trim());
-        hint.textContent = 'Thanks for your rating!';
-        hint.classList.add('ok');
-        setTimeout(() => tpl.remove(), 900);
-      } catch (err) {
-        hint.textContent = String(
-          err?.message || 'Failed to send rating. Please try again.'
-        );
-        hint.classList.remove('ok');
-        sendB.disabled = false;
-      }
-    });
+});
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !qs('#rating-overlay.hidden')) return; // rating açıksa kapatma akışı aşağıda
+  if (e.key === 'Escape') {
+    const r = refs();
+    hide(r.overlay);
+    document.documentElement.style.overflow = '';
+    if (r.pmIframe) r.pmIframe.src = '';
   }
+});
+
+document.addEventListener('click', e => {
+  const r = refs();
+  if (!e.target.closest('#pm-fav-btn')) return;
+  const id = r.content?.dataset?.recipeId || window.__currentRecipeId || '';
+  if (!id) return;
+  const added = toggleFavoriteById(id, currentRecipe);
+  if (r.favBtn)
+    r.favBtn.textContent = added ? 'Remove favorite' : 'Add to favorite';
+  window.dispatchEvent(new Event('favorites:updated'));
+});
+
+/* ===== Video Play / Pause ===== */
+(function setupVideoControls() {
+  const r = refs();
+  if (!r.pmVideo) return;
+  let isPlaying = false;
+  r.playBtn?.addEventListener('click', () => {
+    if (!r.pmIframe?.src) return;
+    const sep = r.pmIframe.src.includes('?') ? '&' : '?';
+    if (!r.pmIframe.src.includes('autoplay=1'))
+      r.pmIframe.src += `${sep}autoplay=1`;
+    r.pmVideo.classList.add('is-playing');
+    isPlaying = true;
+  });
+  r.clickCatcher?.addEventListener('click', () => {
+    if (!r.pmIframe?.src) return;
+    r.pmIframe.src = r.pmIframe.src.replace(/[?&]autoplay=1/, '');
+    r.pmVideo.classList.remove('is-playing');
+    isPlaying = false;
+  });
 })();
+
+/* ===== Rating overlay ===== */
+document.addEventListener('click', e => {
+  const r = refs();
+  if (e.target.closest('#pm-rate-btn')) {
+    currentRating = 0;
+    if (r.ratingValueEl) r.ratingValueEl.textContent = '0.00';
+    if (r.ratingEmail) r.ratingEmail.value = '';
+    if (r.ratingHint) r.ratingHint.textContent = '';
+    if (r.ratingSend) r.ratingSend.disabled = true;
+    clearRatingStars(r.ratingStars);
+    show(r.ratingOverlay);
+    return;
+  }
+  if (
+    e.target.closest('#rating-close') ||
+    (r.ratingOverlay && e.target === r.ratingOverlay)
+  ) {
+    hide(r.ratingOverlay);
+  }
+});
+window.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const r = refs();
+  if (!r.ratingOverlay?.classList.contains('hidden')) hide(r.ratingOverlay);
+});
+
+document.addEventListener('click', e => {
+  const r = refs();
+  const halfBtn = e.target.closest('.half-btn');
+  if (!halfBtn || !r.ratingStars?.contains(halfBtn)) return;
+  const val = parseFloat(halfBtn.dataset.val || halfBtn.dataset.value);
+  if (!val) return;
+  currentRating = val;
+  if (r.ratingValueEl) r.ratingValueEl.textContent = val.toFixed(2);
+  paintRatingStars(r.ratingStars, val);
+  validateRatingForm(r);
+});
+document.addEventListener('input', e => {
+  const r = refs();
+  if (e.target === r.ratingEmail) validateRatingForm(r);
+});
+document.addEventListener('click', async e => {
+  const r = refs();
+  if (!e.target.closest('#rating-send')) return;
+  const id =
+    r.ratingOverlay?.dataset?.recipeId || r.content?.dataset?.recipeId || '';
+  if (!id) return;
+  const payload = {
+    rate: currentRating,
+    email: r.ratingEmail?.value.trim() || '',
+  };
+  try {
+    if (r.ratingSend) r.ratingSend.disabled = true;
+    const res = await fetch(
+      `${API_ROOT}/recipes/${encodeURIComponent(id)}/rating`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!res.ok) throw new Error('Failed to send rating');
+    if (r.ratingHint) {
+      r.ratingHint.textContent = 'Thanks for rating!';
+      r.ratingHint.classList.add('ok');
+    }
+    try {
+      const fresh = await fetch(
+        `${API_ROOT}/recipes/${encodeURIComponent(id)}`
+      ).then(x => x.json());
+      if (r.pmRatingVal)
+        r.pmRatingVal.textContent = format2Trunc(fresh?.rating);
+      renderStaticStars(r.pmStars, fresh?.rating ?? 0);
+    } catch {}
+    setTimeout(() => hide(r.ratingOverlay), 900);
+  } catch (err) {
+    if (r.ratingHint) {
+      r.ratingHint.textContent = err?.message || 'Error sending rating.';
+      r.ratingHint.classList.remove('ok');
+    }
+  } finally {
+    if (r.ratingSend) r.ratingSend.disabled = false;
+  }
+});
+
+/* ===== Resize: üst satırı canlı güncelle ===== */
+window.addEventListener('resize', ensureTopRow);
