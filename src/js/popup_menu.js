@@ -1,6 +1,8 @@
 // js/popup_menu.js — favori toggle + rating + detay fetch + responsive düzen
 const API_ROOT = 'https://tasty-treats-backend.p.goit.global/api';
 
+import { toggleFavorite } from './home-filter.js';
+
 /* ===== Helpers ===== */
 const qs = (s, p = document) => p.querySelector(s);
 const qsa = (s, p = document) => [...p.querySelectorAll(s)];
@@ -80,6 +82,7 @@ function makeFavoritePayload(src) {
 function toggleFavoriteById(id, recipeObjForAdd) {
   const list = getFavorites();
   const idx = findIndexById(list, id);
+  toggleFavorite(recipeObjForAdd, true);
   if (idx !== -1) {
     list.splice(idx, 1);
     setFavorites(list);
