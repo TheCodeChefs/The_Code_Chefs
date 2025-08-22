@@ -1,6 +1,3 @@
-// js/favorites-filter.js — kategori + sayfalama, responsive, boş veri ve LOADING
-
-// -------------------------------------------------------
 // SVG sprite helper
 const SPRITE_PATH = '../img/icons.svg';
 function svgIcon(name, className = '') {
@@ -8,8 +5,6 @@ function svgIcon(name, className = '') {
     <use href="${SPRITE_PATH}#icon-${name}"></use>
   </svg>`;
 }
-
-console.log('✅ favorites-filter.js çalışıyor.');
 
 /* ===== Kategori barını container soluna hizala (eski doğru davranış) ===== */
 function alignWithContainer() {
@@ -32,7 +27,18 @@ function alignWithContainer() {
 window.addEventListener('load', alignWithContainer);
 window.addEventListener('resize', alignWithContainer);
 
-// === localStorage helpers
+/* ===== Cross-tab publish (index.html & favorites.html arası) ===== */
+const favBC =
+  'BroadcastChannel' in window ? new BroadcastChannel('favorites') : null;
+function broadcastFavoritesChange() {
+  window.dispatchEvent(new Event('favorites:updated'));
+  if (favBC) favBC.postMessage({ type: 'favorites:updated', at: Date.now() });
+  try {
+    if (typeof window.renderAll === 'function') window.renderAll();
+  } catch {}
+}
+
+/* === localStorage helpers */
 function getFavoritesLS() {
   try {
     const v = JSON.parse(localStorage.getItem('favorites'));
@@ -43,6 +49,8 @@ function getFavoritesLS() {
 }
 function setFavoritesLS(arr) {
   localStorage.setItem('favorites', JSON.stringify(arr || []));
+  // Tek yerden yayın
+  broadcastFavoritesChange();
 }
 function getRecipeIdSafe(r) {
   return r?._id || r?.id;
@@ -61,16 +69,23 @@ const esc = s =>
       }[m])
   );
 
-// === Yıldızlar
-function getStarIcons(rating = 0) {
-  const full = Math.max(0, Math.min(5, Math.floor(Number(rating) || 0)));
-  const empty = 5 - full;
+// === Yıldızlar (boş yıldız eklemez; sadece dolu yıldız sayısı kadar gösterir)
+function getStarIcons(rating = 0, { max = 5, fillEmpty = false } = {}) {
+  const full = Math.max(0, Math.min(max, Math.floor(Number(rating) || 0)));
   const filled = Array.from({ length: full })
     .map(() => svgIcon('Star', 'star-icon'))
     .join('');
+
+  if (!fillEmpty) {
+    // 5'e tamamlayan boş/siyah yıldız istenmiyor
+    return filled;
+  }
+
+  const empty = Math.max(0, max - full);
   const empties = Array.from({ length: empty })
     .map(() => svgIcon('Star-empty', 'star-icon empty'))
     .join('');
+
   return `${filled}${empties}`;
 }
 
@@ -392,7 +407,9 @@ function renderCards() {
         <div class="recipe-meta">
           <span class="star-group">
             ${Number(recipe.rating ?? 0).toFixed(2)}
-            <span class="star-icon">${getStarIcons(recipe.rating)}</span>
+            <span class="star-icon">
+              ${getStarIcons(recipe.rating)} 
+            </span>
           </span>
           <button class="secondary-button see-recipe-btn">See recipe</button>
         </div>
@@ -406,10 +423,9 @@ function renderCards() {
       const idx = all.findIndex(r => String(getRecipeIdSafe(r)) === rid);
       if (idx !== -1) {
         all.splice(idx, 1);
-        setFavoritesLS(all);
-        window.dispatchEvent(new Event('favorites:updated'));
+        setFavoritesLS(all); // setFavoritesLS → broadcastFavoritesChange()
       }
-      renderAll();
+      // Yeni yayın akışı zaten renderAll tetikliyor
     });
 
     // Popup aç
@@ -439,6 +455,8 @@ function renderAll() {
   renderCategories(items); // burada boşsa kategori barı gizlenir
   renderCards();
 }
+// Popup'tan doğrudan çağrı için global'e bağla
+window.renderAll = renderAll;
 
 /* ==== Açılış ==== */
 window.addEventListener('load', () => {
@@ -476,3 +494,12 @@ window.addEventListener('favorites:updated', () => {
   hideLoading();
   renderAll();
 });
+// BroadcastChannel’dan gelen mesajlar
+if (favBC) {
+  favBC.onmessage = ev => {
+    if (ev.data?.type === 'favorites:updated') {
+      hideLoading();
+      renderAll();
+    }
+  };
+}

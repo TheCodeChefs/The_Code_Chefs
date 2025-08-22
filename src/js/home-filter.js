@@ -23,27 +23,30 @@ let selectedIngredient = '';
 let currentPage = 1;
 const recipesPerPage = 9;
 
-// Favorileri localStorage destekli Set ile yönetiyoruz
+// Favoriler (LS)
 let favorites = [];
 
 function isInFavorites(id) {
-  return favorites.some(item => item._id === id);
+  return favorites.some(item => String(item._id) === String(id));
 }
 
 function saveFavoritesToLocalStorage() {
   localStorage.setItem('favorites', JSON.stringify(favorites));
 }
 
+// ✅ Düzeltilmiş: push yerine direkt atama
 function loadFavoritesFromLocalStorage() {
   const favs = localStorage.getItem('favorites');
   if (favs) {
     try {
       const favArray = JSON.parse(favs);
-      favArray.forEach(item => favorites.push(item));
+      favorites = Array.isArray(favArray) ? favArray : [];
     } catch {
-      // Hatalı veri varsa temizle
       localStorage.removeItem('favorites');
+      favorites = [];
     }
+  } else {
+    favorites = [];
   }
 }
 
@@ -215,6 +218,10 @@ async function fetchAndRenderRecipes(page = 1) {
     }
     emptyRecipeGridEl.innerHTML = '';
     renderRecipes(recipes);
+
+    // ✅ İlk çizimde görünen kalpleri LS ile eşitle
+    refreshAllVisibleHearts();
+
     renderPagination(totalPages, currentPage);
   } catch (err) {
     console.error('Tarifler yüklenirken hata:', err);
@@ -268,6 +275,26 @@ function renderFavoriteIcon(id) {
         </svg>`;
 }
 
+// --- ADD: tek butonun kalbini yenile
+function refreshHeartById(id) {
+  const safeId = String(id);
+  const btn = document.getElementById(`favorite-button-${safeId}`);
+  if (!btn) return;
+  btn.innerHTML = renderFavoriteIcon(safeId);
+}
+
+// --- ADD: görünür tüm kalpleri LS'e göre eşitle
+function refreshAllVisibleHearts() {
+  const btns = document.querySelectorAll(
+    '.favorite-btn[id^="favorite-button-"]'
+  );
+  if (!btns.length) return;
+  btns.forEach(btn => {
+    const rid = btn.id.replace('favorite-button-', '');
+    btn.innerHTML = renderFavoriteIcon(rid);
+  });
+}
+
 function getRecipeIdSafe(r) {
   return r?._id || r?.id;
 }
@@ -276,7 +303,7 @@ function renderRecipes(recipes) {
   recipeGridEl.innerHTML = '';
   recipes.forEach(recipe => {
     const card = document.createElement('div');
-    card.className = 'recipe-card';
+    card.className = 'home-recipe-card';
 
     const imageUrl =
       recipe.thumb || 'https://via.placeholder.com/280x180?text=No+Image';
@@ -289,13 +316,13 @@ function renderRecipes(recipes) {
        recipe._id
      }' class="favorite-btn">${renderFavoriteIcon(recipe._id)}</button>
      
-      <div class="recipe-card-bottom">
-        <div class="recipe-card-desc">
+      <div class="home-recipe-card-bottom">
+        <div class="home-recipe-card-desc">
             <h3>${recipe.title}</h3>
             <p>${recipe.description || ''}</p>
         </div>
      
-        <div class="recipe-card-button">
+        <div class="home-recipe-card-button">
             <div class="stars">
                 <div class="floatCount">
                 ${ratingValue}
@@ -307,6 +334,7 @@ function renderRecipes(recipes) {
       </div>
     `;
 
+    // Home içinde kendi kalbini toggle (LS + ikon)
     card.querySelector('.favorite-btn').addEventListener('click', () => {
       toggleFavorite(recipe);
     });
@@ -327,7 +355,9 @@ function renderRecipes(recipes) {
 
 export function toggleFavorite(recipe, byPassLocalSave = false) {
   if (isInFavorites(recipe._id)) {
-    favorites = favorites.filter(item => item._id !== recipe._id);
+    favorites = favorites.filter(
+      item => String(item._id) !== String(recipe._id)
+    );
   } else {
     favorites.push(recipe);
   }
@@ -341,6 +371,10 @@ export function toggleFavorite(recipe, byPassLocalSave = false) {
   }
 
   !byPassLocalSave && saveFavoritesToLocalStorage();
+
+  // --- ADD: favorites sayfası için geniş yayın (opsiyonel ama faydalı)
+  window.dispatchEvent(new Event('favorites:updated'));
+  document.dispatchEvent(new Event('favorites:updated'));
 }
 
 function renderPagination(totalPages, currentPage) {
@@ -483,6 +517,24 @@ async function loadPopularRecipes() {
     console.error('Popüler tarifler alınamadı:', error);
   }
 }
+
+/* --- ADD: popup'tan tek-id güncelleme + dış senk --- */
+window.addEventListener('favorites:sync', e => {
+  const id = e?.detail?.id;
+  if (!id) return;
+  loadFavoritesFromLocalStorage();
+  refreshHeartById(id);
+});
+window.addEventListener('favorites:updated', () => {
+  loadFavoritesFromLocalStorage();
+  refreshAllVisibleHearts();
+});
+window.addEventListener('storage', e => {
+  if (e.key === 'favorites') {
+    loadFavoritesFromLocalStorage();
+    refreshAllVisibleHearts();
+  }
+});
 
 window.addEventListener('DOMContentLoaded', async () => {
   loadFavoritesFromLocalStorage();

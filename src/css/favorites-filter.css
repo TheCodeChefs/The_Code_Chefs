@@ -288,6 +288,89 @@
   display: none;
 }
 
+/* === Pagination === */
+.pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.pagination button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.22;
+  letter-spacing: 0;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.pagination button:not(.active):not(.page-icon) {
+  background-color: var(--background-white);
+  border: 1px solid rgba(5, 5, 5, 0.2);
+  color: var(--main-black);
+}
+
+.pagination button:not(.active):not(:disabled):hover {
+  border-color: rgba(5, 5, 5, 0.3);
+}
+
+.pagination button.active {
+  background-color: var(--main-green);
+  color: var(--main-black);
+  border: none;
+}
+
+.pagination button.dots {
+  background-color: var(--background-white);
+  border: 1px solid rgba(5, 5, 5, 0.2);
+  color: var(--main-black);
+  cursor: default;
+}
+
+.pagination button.dots:hover {
+  background-color: var(--background-white);
+  border-color: rgba(5, 5, 5, 0.3);
+}
+
+.pagination button.page-icon:not(:disabled) {
+  background-color: var(--main-green);
+  color: var(--main-black);
+  border: none;
+}
+
+.pagination button.page-icon:disabled {
+  background-color: var(--main-black);
+  color: rgba(248, 248, 248, 0.5);
+  cursor: default;
+}
+
+.pagination button.page-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.page-icon .double-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.page-icon svg {
+  width: 8px;
+  height: 16px;
+  display: block;
+}
+
 /* === Responsive === */
 @media (min-width: 768px) {
   .favorites-filter {
@@ -338,7 +421,7 @@
   }
 
   .recipe-card-content {
-    padding: 8px;
+    padding: 12px;
   }
 
   .star-group {
@@ -355,7 +438,15 @@
   }
 
   .recipe-meta button {
-    width: 110px;
+    width: 89px;
+  }
+
+  .pagination {
+    margin-top: 64px;
+  }
+  .pagination button {
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -366,6 +457,10 @@
 
   .category-wrapper {
     padding: 0 0 32px 100px;
+  }
+
+  .favorites-list {
+    padding: 0 80px;
   }
 
   .favorites-list .recipe-card {
@@ -392,93 +487,11 @@
   }
 
   .recipe-meta button {
-    width: 93px;
+    width: 89px;
   }
-}
 
-/* === Pagination === */
-.pagination {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
-  margin-top: 24px;
-}
-.pagination button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 18px;
-  font-weight: var(--fw-semibold);
-  line-height: 1.22;
-  letter-spacing: 0;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease,
-    border-color 0.2s ease;
-}
-@media (min-width: 768px) {
-  .pagination {
-    margin-top: 64px;
-  }
-  .pagination button {
-    width: 40px;
-    height: 40px;
-  }
-}
-@media (min-width: 1280px) {
   .pagination button {
     width: 44px;
     height: 44px;
   }
-}
-.pagination button:not(.active):not(.page-icon) {
-  background-color: var(--background-white);
-  border: 1px solid rgba(5, 5, 5, 0.2);
-  color: var(--main-black);
-}
-.pagination button:not(.active):not(:disabled):hover {
-  border-color: rgba(5, 5, 5, 0.3);
-}
-.pagination button.active {
-  background-color: var(--main-green);
-  color: var(--main-black);
-  border: none;
-}
-.pagination button.dots {
-  background-color: var(--background-white);
-  border: 1px solid rgba(5, 5, 5, 0.2);
-  color: var(--main-black);
-  cursor: default;
-}
-.pagination button.dots:hover {
-  background-color: var(--background-white);
-  border-color: rgba(5, 5, 5, 0.3);
-}
-.pagination button.page-icon:not(:disabled) {
-  background-color: var(--main-green);
-  color: var(--main-black);
-  border: none;
-}
-.pagination button.page-icon:disabled {
-  background-color: var(--main-black);
-  color: rgba(248, 248, 248, 0.5);
-  cursor: default;
-}
-.pagination button.page-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-.page-icon .double-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-}
-.page-icon svg {
-  width: 8px;
-  height: 16px;
-  display: block;
 }
