@@ -276,7 +276,7 @@ function renderRecipes(recipes) {
   recipeGridEl.innerHTML = '';
   recipes.forEach(recipe => {
     const card = document.createElement('div');
-    card.className = 'recipe-card';
+    card.className = 'home-recipe-card';
 
     const imageUrl =
       recipe.thumb || 'https://via.placeholder.com/280x180?text=No+Image';
@@ -289,13 +289,13 @@ function renderRecipes(recipes) {
        recipe._id
      }' class="favorite-btn">${renderFavoriteIcon(recipe._id)}</button>
      
-      <div class="recipe-card-bottom">
-        <div class="recipe-card-desc">
+      <div class="home-recipe-card-bottom">
+        <div class="home-recipe-card-desc">
             <h3>${recipe.title}</h3>
             <p>${recipe.description || ''}</p>
         </div>
      
-        <div class="recipe-card-button">
+        <div class="home-recipe-card-button">
             <div class="stars">
                 <div class="floatCount">
                 ${ratingValue}
