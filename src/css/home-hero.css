@@ -134,9 +134,18 @@
     position: absolute;
     top: 14px;
     right: 14px;
+    color: var(--main-black);
   }
   .show-order-now {
     display: block;
+  }
+  .icons-area {
+    gap: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: absolute;
+    right: -20px;
   }
 }
 @media screen and (min-width: 768px) {
