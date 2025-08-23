@@ -18,6 +18,13 @@ const esc = s =>
         "'": '&#39;',
       }[m])
   );
+// 2 ondalık TRUNC (istemiyorsan toFixed kullanabilirsin)
+function format2Trunc(v) {
+  const n = Number.parseFloat(String(v ?? '').replace(',', '.'));
+  if (!Number.isFinite(n)) return '0.00';
+  const t = Math.trunc(n * 100) / 100;
+  return t.toFixed(2);
+}
 
 /* = Sprite (popup yıldızları için) = */
 const SPRITE_PATH = '../img/icons.svg';
@@ -102,6 +109,7 @@ function toggleFavoriteById(id, recipeObjForAdd) {
 
 /* = Popup state/refs = */
 let currentRecipe = null;
+let currentRating = 0; // ⭐ rating overlay için
 window.__currentRecipeId = '';
 
 function refs() {
@@ -119,6 +127,15 @@ function refs() {
     pmTags: qs('#pm-tags'),
     pmDesc: qs('#pm-desc'),
     favBtn: qs('#pm-fav-btn'),
+
+    // ⭐ rating overlay elemanları
+    rateBtn: qs('#pm-rate-btn'),
+    ratingOverlay: qs('#rating-overlay'),
+    ratingStars: qs('#rating-stars'),
+    ratingValueEl: qs('#rating-value'),
+    ratingEmail: qs('#rating-email'),
+    ratingSend: qs('#rating-send'),
+    ratingHint: qs('#rating-hint'),
   };
 }
 
@@ -143,11 +160,11 @@ function renderDetails(recipe) {
   const id = String(getIdSafe(recipe));
   if (id) {
     r.content.dataset.recipeId = id;
+    r.ratingOverlay && (r.ratingOverlay.dataset.recipeId = id); // ⭐ rating overlay id
     window.__currentRecipeId = id;
   }
   r.pmTitle && (r.pmTitle.textContent = recipe.title || 'Untitled');
-  r.pmRatingVal &&
-    (r.pmRatingVal.textContent = (Number(recipe.rating) || 0).toFixed(2));
+  r.pmRatingVal && (r.pmRatingVal.textContent = format2Trunc(recipe.rating));
   renderStaticStars(r.pmStars, recipe.rating || 0);
   r.pmTime && (r.pmTime.textContent = recipe.time ? `${recipe.time} min` : '');
 
@@ -245,13 +262,17 @@ document.addEventListener('click', e => {
     r.pmIframe && (r.pmIframe.src = '');
   }
 });
+// Escape: önce rating açıksa onu kapat, değilse popup'ı
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    const r = refs();
-    hide(r.overlay);
-    document.documentElement.style.overflow = '';
-    r.pmIframe && (r.pmIframe.src = '');
+  if (e.key !== 'Escape') return;
+  const r = refs();
+  if (r.ratingOverlay && !r.ratingOverlay.classList.contains('hidden')) {
+    hide(r.ratingOverlay);
+    return;
   }
+  hide(r.overlay);
+  document.documentElement.style.overflow = '';
+  r.pmIframe && (r.pmIframe.src = '');
 });
 
 /* = Fav buton = */
@@ -263,4 +284,122 @@ document.addEventListener('click', e => {
   const on = toggleFavoriteById(id, currentRecipe);
   r.favBtn &&
     (r.favBtn.textContent = on ? 'Remove to favorite' : 'Add to favorite');
+});
+
+/* ============ ⭐ Rating overlay ============ */
+// yıldızları temizle/boyama
+function clearRatingStars(starsRoot) {
+  if (!starsRoot) return;
+  qsa('svg path', starsRoot).forEach(p => p.setAttribute('fill', '#dcdcdc'));
+}
+function paintRatingStars(starsRoot, val) {
+  if (!starsRoot) return;
+  clearRatingStars(starsRoot);
+  const full = Math.floor(val);
+  const half = val % 1 >= 0.5;
+  qsa('.star-container', starsRoot).forEach((c, idx) => {
+    const num = idx + 1;
+    const path = qs('path', c);
+    if (!path) return;
+    if (num <= full) path.setAttribute('fill', '#eea10b');
+    else if (num === full + 1 && half)
+      path.setAttribute('fill', `url(#halfGradient-${num})`);
+  });
+}
+function validateRatingForm(r) {
+  const email = r.ratingEmail?.value.trim() || '';
+  const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const ok = currentRating > 0 && okEmail;
+  if (r.ratingSend) r.ratingSend.disabled = !ok;
+  if (r.ratingHint)
+    r.ratingHint.textContent = ok ? '' : 'Enter valid email and select rating.';
+}
+
+// Aç
+document.addEventListener('click', e => {
+  const r = refs();
+  if (e.target.closest('#pm-rate-btn')) {
+    currentRating = 0;
+    r.ratingValueEl && (r.ratingValueEl.textContent = '0.00');
+    r.ratingEmail && (r.ratingEmail.value = '');
+    r.ratingHint && (r.ratingHint.textContent = '');
+    r.ratingSend && (r.ratingSend.disabled = true);
+    clearRatingStars(r.ratingStars);
+    show(r.ratingOverlay);
+    return;
+  }
+  // Kapat
+  if (
+    e.target.closest('#rating-close') ||
+    (r.ratingOverlay && e.target === r.ratingOverlay)
+  ) {
+    hide(r.ratingOverlay);
+  }
+});
+
+// E-posta girildikçe buton aktif/pasif
+document.addEventListener('input', e => {
+  const r = refs();
+  if (e.target === r.ratingEmail) validateRatingForm(r);
+});
+
+// Yarım/dolu seçimi
+document.addEventListener('click', e => {
+  const r = refs();
+  const halfBtn = e.target.closest('.half-btn');
+  if (!halfBtn || !r.ratingStars?.contains(halfBtn)) return;
+  const val = parseFloat(halfBtn.dataset.val || halfBtn.dataset.value);
+  if (!val) return;
+  currentRating = val;
+  r.ratingValueEl && (r.ratingValueEl.textContent = val.toFixed(2));
+  paintRatingStars(r.ratingStars, val);
+  validateRatingForm(r);
+});
+
+// Gönder
+document.addEventListener('click', async e => {
+  const r = refs();
+  if (!e.target.closest('#rating-send')) return;
+  const id =
+    r.ratingOverlay?.dataset?.recipeId || r.content?.dataset?.recipeId || '';
+  if (!id) return;
+  const payload = {
+    rate: currentRating,
+    email: r.ratingEmail?.value.trim() || '',
+  };
+
+  try {
+    r.ratingSend && (r.ratingSend.disabled = true);
+    const res = await fetch(
+      `${API_ROOT}/recipes/${encodeURIComponent(id)}/rating`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!res.ok) throw new Error('Failed to send rating');
+
+    r.ratingHint && (r.ratingHint.textContent = 'Thanks for rating!');
+    r.ratingHint && r.ratingHint.classList.add('ok');
+
+    // Güncel rating'i çekip popup üstündeki değeri/ikonları güncelle
+    try {
+      const fresh = await fetch(
+        `${API_ROOT}/recipes/${encodeURIComponent(id)}`
+      ).then(x => x.json());
+      r.pmRatingVal &&
+        (r.pmRatingVal.textContent = format2Trunc(fresh?.rating));
+      renderStaticStars(r.pmStars, fresh?.rating ?? 0);
+    } catch {}
+
+    setTimeout(() => hide(r.ratingOverlay), 900);
+  } catch (err) {
+    if (r.ratingHint) {
+      r.ratingHint.textContent = err?.message || 'Error sending rating.';
+      r.ratingHint.classList.remove('ok');
+    }
+  } finally {
+    r.ratingSend && (r.ratingSend.disabled = false);
+  }
 });
