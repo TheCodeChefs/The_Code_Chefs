@@ -20,3 +20,12 @@ closeButton.addEventListener('click', () => {
   toggleLabel.classList.remove('toggle-label-show');
   toggleInput.classList.remove('toggle-label-show');
 });
+toggleInput.addEventListener('change', () => {
+  if (toggleInput.checked) {
+    document.body.setAttribute('data-theme', 'dark');
+    mobileMenu.classList.add('mobile-menu-color');
+  } else {
+    document.body.setAttribute('data-theme', 'light');
+    mobileMenu.classList.remove('mobile-menu-color');
+  }
+});

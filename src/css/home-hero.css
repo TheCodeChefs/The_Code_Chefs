@@ -34,7 +34,7 @@
     margin-right: 8px;
   }
   .swiper-slide img {
-    background-color: var(--main-black) !important;
+    background-color: #161616 !important;
     display: block;
   }
   .swiper-pagination-bullet {
@@ -138,14 +138,6 @@
   }
   .show-order-now {
     display: block;
-  }
-  .icons-area {
-    gap: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    position: absolute;
-    right: -20px;
   }
 }
 @media screen and (min-width: 768px) {

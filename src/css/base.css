@@ -11,7 +11,7 @@
   --main-green: #9bb537;
   --main-black: #050505;
   --background-white: #f8f8f8;
-  --background-dark: #1e1e1e;
+  --background-dark: #161616;
   --input-border-color: rgba(5, 5, 5, 0.2);
   --input-border-hover-color: rgba(5, 5, 5, 0.3);
   --input-text-color: rgba(5, 5, 5, 0.5);
@@ -22,17 +22,24 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
-
+body {
+  background-color: var(--background-white);
+}
+[data-theme='light'] {
+  --main-green: #9bb537;
+  --main-black: #050505;
+  --background-white: #f8f8f8;
+}
+[data-theme='dark'] {
+  --main-green: #9bb537;
+  --main-black: #f8f8f8;
+  --background-white: #050505;
+}
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
-body {
-  background-color: var(--main-white);
-}
-
 section {
   margin: 0;
   padding: 0;
@@ -51,6 +58,7 @@ h1 {
   font-size: 36px;
   line-height: 1.2;
   letter-spacing: 0;
+  color: var(--main-black);
 }
 
 h2 {
@@ -58,6 +66,7 @@ h2 {
   font-size: 24px;
   line-height: 1.5;
   letter-spacing: 0;
+  color: var(--main-black);
 }
 
 h3 {
@@ -65,6 +74,7 @@ h3 {
   font-size: 16px;
   line-height: 1.2;
   letter-spacing: 0;
+  color: var(--main-black);
 }
 
 h4 {
@@ -72,6 +82,7 @@ h4 {
   font-size: 14px;
   line-height: 1.2;
   letter-spacing: 0;
+  color: var(--main-black);
 }
 
 .primary-button {
