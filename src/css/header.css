@@ -10,7 +10,7 @@
     width: 100%;
     height: 100vh;
     background-color: var(--main-green);
-    z-index: 2;
+    z-index: 9999;
     padding: 20px;
     flex-direction: column;
     align-items: center;
