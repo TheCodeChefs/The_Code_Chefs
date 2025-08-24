@@ -110,7 +110,7 @@
     position: absolute;
     bottom: 20px;
     left: 20px;
-    z-index: 999;
+    z-index: 9999;
   }
   .toggle-label-show::after {
     display: block;
