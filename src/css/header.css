@@ -49,6 +49,7 @@
     background: none;
     width: 0;
     height: 0;
+    z-index: 10000;
   }
   .toggle:checked + .toggle-label::after {
     left: 26px;
@@ -63,6 +64,7 @@
     display: block;
     background: #cecdcd;
     border-radius: 200px;
+    z-index: 10000;
   }
   .toggle-label::after {
     display: none;
@@ -73,6 +75,7 @@
     border-radius: 200px;
     transition: all 0.3s ease-in-out;
     z-index: 5;
+    z-index: 10000;
   }
   header {
     width: 100%;
