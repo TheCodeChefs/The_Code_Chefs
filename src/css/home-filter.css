@@ -3,7 +3,7 @@
   flex-direction: column;
   margin: 80px 0px 50px 0px;
   justify-content: center;
-  max-width: 375px;
+  max-width: 335px;
 }
 
 /* Sol filtre paneli */
@@ -24,12 +24,12 @@
   letter-spacing: 0;
   height: 50px;
   background: none;
-  border: 1px solid #05050533;
+  border: 1px solid var(--input-border-color);
   border-radius: 15px;
   cursor: pointer;
   text-align: center;
   width: 176px;
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color);
 }
 
 /* Popüler tarifler */
@@ -65,10 +65,6 @@
   transition: background-color 0.3s ease;
 }
 
-.popular-card:hover {
-  background-color: #f0f0f0;
-}
-
 .popular-card img {
   width: 64px;
   height: 64px;
@@ -91,7 +87,7 @@
   font-size: 14px;
   line-height: 18px;
   text-transform: uppercase;
-  color: #050505;
+  color: var(--main-black);
   margin: 0 0 4px 0;
   white-space: nowrap;
   overflow: hidden;
@@ -103,7 +99,7 @@
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
-  color: rgba(5, 5, 5, 0.8);
+  color: var(--input-text-color-2);
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -145,7 +141,7 @@
   line-height: 20px;
   letter-spacing: 0;
   vertical-align: middle;
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color);
   background: none;
   border: none;
   padding: 0;
@@ -192,6 +188,7 @@
 .filter-content {
   display: flex;
   flex-direction: column;
+  max-width: 335px;
 }
 
 select option {
@@ -210,8 +207,9 @@ select option {
   border: 1px solid var(--input-border-color);
   border-radius: 12px;
   font-size: 16px;
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color);
   width: 100%;
+  background-color: var(--background-white);
 }
 
 .search-with-icon {
@@ -225,12 +223,13 @@ select option {
   border: 1px solid var(--input-border-color);
   border-radius: 12px;
   font-size: 16px;
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color);
   width: 100%;
+  background: none;
 }
 
 .search-input::placeholder {
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color);
 }
 
 .select-filter option {
@@ -240,7 +239,8 @@ select option {
   line-height: 20px;
   letter-spacing: 0;
   vertical-align: middle;
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color);
+  background: none;
 }
 
 /* Reset filter */
@@ -295,7 +295,7 @@ select option {
 
 .home-recipe-card h3 {
   font-size: 16px;
-  color: var(--background-white);
+  color: var(--input-text-color-4);
   font-weight: 600;
   font-family: 'Inter', sans-serif;
 }
@@ -304,7 +304,7 @@ select option {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 400;
-  color: var(--background-white);
+  color: var(--input-text-color-3);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -341,7 +341,7 @@ select option {
 
 .see-recipe-btn {
   background-color: var(--main-green);
-  color: var(--background-white);
+  color: var(--input-text-color-4);
   font-size: 12px;
   line-height: 100%;
   font-weight: 500;
@@ -367,6 +367,7 @@ select option {
   width: 15px;
   top: 15px;
   padding-left: 18px;
+  box-sizing: unset;
 }
 
 .icon-arrow-down {
@@ -380,7 +381,7 @@ select option {
 
 .floatCount {
   font-weight: 500;
-  color: var(--background-white);
+  color: var(--input-text-color-3);
   font-size: 18px;
   line-height: 18px;
 }
@@ -457,7 +458,7 @@ select option {
 }
 
 .pagination-container button.disabled {
-  background-color: var(--main-black);
+  background-color: #050505;
   color: white;
   cursor: default;
   pointer-events: none;
@@ -471,7 +472,7 @@ select option {
   .filter-main {
     flex-direction: row;
     gap: 32px;
-    max-width: 768px;
+    max-width: 704px;
   }
 
   .filter-sidebar {
@@ -511,7 +512,7 @@ select option {
   }
 
   .home-recipe-card {
-    min-width: 240px;
+    min-width: 100%;
     height: 264px;
     border-radius: 8px;
     gap: 16px;
@@ -520,12 +521,57 @@ select option {
   .pagination-container {
     gap: 12px;
   }
+
+  .filter-content {
+    max-width: 496px;
+  }
+}
+
+/* Tablet: rating ve buton aynı hizada, buton tek satır ve taşmadan */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .home-recipe-card-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* düşmeyi engeller */
+    gap: 12px;
+    overflow: hidden; /* dışa taşmayı kes */
+  }
+
+  .home-recipe-card .stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow: hidden; /* trunc dışı yıldız görünmesin */
+  }
+
+  .home-recipe-card .floatCount {
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .home-recipe-card .icon-yellow-star,
+  .home-recipe-card .icon-empty-star {
+    width: 15px; /* tablet için biraz küçük */
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  .home-recipe-card .see-recipe-btn {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px; /* taşmayı azalt */
+    white-space: nowrap; /* tek satırda tut */
+    min-width: 100px; /* çok daralmayı önle */
+    text-align: center;
+    margin-left: -2px; /* biraz sola çek */
+  }
 }
 
 @media (min-width: 1280px) {
   .filter-main {
     gap: 64px;
-    max-width: 1280px;
+    max-width: 1080px;
   }
 
   .filter-sidebar {
@@ -563,8 +609,79 @@ select option {
   }
 
   .home-recipe-card {
-    width: 300px;
+    width: 100%;
     height: 287px;
     gap: 16px;
+  }
+
+  .filter-content {
+    max-width: 782px;
+  }
+
+  .filters {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr; /* Search | Time | Area | Ingredients */
+    gap: 16px; /* mevcut tasarıma uygun boşluk */
+    align-items: end; /* label + input alt hizası */
+  }
+
+  /* Grid içinde genişlik taşmalarını önle */
+  .filter-group {
+    min-width: 0;
+  }
+
+  /* Eski flex davranışlarını etkisizleştir */
+  .filter-group.search {
+    flex-basis: auto;
+    flex-grow: 0;
+  }
+  .filter-group.select-time,
+  .filter-group.select-area,
+  .filter-group.select-ingredients {
+    flex-basis: auto;
+    flex-grow: 0;
+  }
+
+  /* Rating + buton hizalama */
+  .home-recipe-card-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* hepsi ortalanacak */
+    gap: 12px;
+  }
+
+  /* Rating değerini ve yıldızları biraz küçült */
+  .home-recipe-card .stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .home-recipe-card .floatCount {
+    font-size: 14px; /* küçült */
+    line-height: 1;
+  }
+
+  .home-recipe-card .icon-yellow-star,
+  .home-recipe-card .icon-empty-star {
+    width: 14px; /* daha küçük ikon */
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  /* taşmayı engelle: sadece görünen tam/yıldızları göster */
+  .home-recipe-card .stars svg {
+    overflow: hidden;
+  }
+
+  /* See Recipe butonu tek satır + biraz daha büyük */
+  .home-recipe-card .see-recipe-btn {
+    font-size: 13px; /* biraz ufak */
+    font-weight: 600;
+    padding: 8px 14px; /* daha dar padding */
+    white-space: nowrap;
+    min-width: 100px; /* eni küçült */
+    text-align: center;
+    margin-left: -10px; /* hafif sola kaydır */
   }
 }

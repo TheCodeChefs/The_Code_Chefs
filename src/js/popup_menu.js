@@ -18,7 +18,8 @@ const esc = s =>
         "'": '&#39;',
       }[m])
   );
-// 2 ondalık TRUNC (istemiyorsan toFixed kullanabilirsin)
+
+// 2 ondalık TRUNC
 function format2Trunc(v) {
   const n = Number.parseFloat(String(v ?? '').replace(',', '.'));
   if (!Number.isFinite(n)) return '0.00';
@@ -26,8 +27,24 @@ function format2Trunc(v) {
   return t.toFixed(2);
 }
 
+// Güvenli background-image setter (tırnak/paren/ters slash vb. temizler)
+function setBgImage(el, url) {
+  if (!el) return;
+  if (!url) {
+    el.style.backgroundImage = '';
+    return;
+  }
+  const safe = String(url)
+    .trim()
+    .replace(/"/g, '%22')
+    .replace(/\)/g, '%29')
+    .replace(/\(/g, '%28')
+    .replace(/\\+/g, '');
+  el.style.backgroundImage = `url("${safe}")`;
+}
+
 /* = Sprite (popup yıldızları için) = */
-const SPRITE_PATH = '../img/icons.svg';
+const SPRITE_PATH = './img/icons.svg';
 const svgIcon = (name, className = '') =>
   `<svg class="icon ${className}" aria-hidden="true" focusable="false">
      <use href="${SPRITE_PATH}#icon-${name}"></use>
@@ -97,11 +114,8 @@ function toggleFavoriteById(id, recipeObjForAdd) {
     list.unshift(makeFavoritePayload(recipeObjForAdd || { _id: id }));
     nowOn = true;
   }
-  // 1) LS yaz
   setFavorites(list);
-  // 2) İnce taneli: sadece bu kartın kalbini güncelle
   emitFavoritesSync(id, nowOn);
-  // 3) Geniş: favorites sayfası tam listeyi tazelesin
   emitFavoritesUpdated();
 
   return nowOn;
@@ -110,6 +124,7 @@ function toggleFavoriteById(id, recipeObjForAdd) {
 /* = Popup state/refs = */
 let currentRecipe = null;
 let currentRating = 0; // ⭐ rating overlay için
+let ratingSubmitting = false; // çift tıklama kilidi
 window.__currentRecipeId = '';
 
 function refs() {
@@ -146,8 +161,8 @@ const starEmptyHTML = `<span class="star empty">${svgIcon(
 )}</span>`;
 function renderStaticStars(container, val) {
   if (!container) return;
-  const n = Number(val) || 0,
-    full = Math.min(5, Math.max(0, Math.floor(n)));
+  const n = Number(val) || 0;
+  const full = Math.min(5, Math.max(0, Math.floor(n)));
   container.innerHTML = `<span class="star-row">
     ${starFilledHTML.repeat(full)}${starEmptyHTML.repeat(5 - full)}
   </span>`;
@@ -184,8 +199,7 @@ function renderDetails(recipe) {
       recipe.preview ||
       recipe.thumb ||
       '';
-    if (r.pmImage)
-      r.pmImage.style.backgroundImage = img ? `url('${esc(img)}')` : '';
+    setBgImage(r.pmImage, img);
   }
 
   if (r.pmIngredients) {
@@ -195,7 +209,7 @@ function renderDetails(recipe) {
       const measure = typeof it === 'string' ? '' : it?.measure || '';
       const row = document.createElement('div');
       row.className = 'ing-row';
-      row.innerHTML = `<span class="ing-name">${name}</span><span class="ig-measure">${measure}</span>`;
+      row.innerHTML = `<span class="ing-name">${name}</span><span class="ing-measure">${measure}</span>`;
       r.pmIngredients.appendChild(row);
     });
   }
@@ -309,17 +323,24 @@ function paintRatingStars(starsRoot, val) {
 function validateRatingForm(r) {
   const email = r.ratingEmail?.value.trim() || '';
   const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const ok = currentRating > 0 && okEmail;
+  const ok = currentRating > 0 && okEmail && !ratingSubmitting;
   if (r.ratingSend) r.ratingSend.disabled = !ok;
   if (r.ratingHint)
     r.ratingHint.textContent = ok ? '' : 'Enter valid email and select rating.';
 }
 
-// Aç
+// Aç (ID’yi garantiye al)
 document.addEventListener('click', e => {
   const r = refs();
   if (e.target.closest('#pm-rate-btn')) {
+    // overlay’e id’yi yeniden yaz
+    const idNow =
+      r.content?.dataset?.recipeId || window.__currentRecipeId || '';
+    if (idNow && r.ratingOverlay)
+      r.ratingOverlay.dataset.recipeId = String(idNow);
+
     currentRating = 0;
+    ratingSubmitting = false;
     r.ratingValueEl && (r.ratingValueEl.textContent = '0.00');
     r.ratingEmail && (r.ratingEmail.value = '');
     r.ratingHint && (r.ratingHint.textContent = '');
@@ -360,28 +381,54 @@ document.addEventListener('click', e => {
 document.addEventListener('click', async e => {
   const r = refs();
   if (!e.target.closest('#rating-send')) return;
+
+  if (ratingSubmitting) return;
+
+  // ID’yi 3 farklı yerden güvenli al
   const id =
-    r.ratingOverlay?.dataset?.recipeId || r.content?.dataset?.recipeId || '';
-  if (!id) return;
+    r.ratingOverlay?.dataset?.recipeId ||
+    r.content?.dataset?.recipeId ||
+    window.__currentRecipeId ||
+    '';
+  if (!id) {
+    if (r.ratingHint) {
+      r.ratingHint.textContent = 'Technical error: recipe id missing.';
+      r.ratingHint.classList.remove('ok');
+    }
+    return;
+  }
+
   const payload = {
-    rate: currentRating,
-    email: r.ratingEmail?.value.trim() || '',
+    rate: Number(currentRating),
+    email: (r.ratingEmail?.value || '').trim(),
   };
 
   try {
-    r.ratingSend && (r.ratingSend.disabled = true);
-    const res = await fetch(
-      `${API_ROOT}/recipes/${encodeURIComponent(id)}/rating`,
-      {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      }
-    );
-    if (!res.ok) throw new Error('Failed to send rating');
+    ratingSubmitting = true;
+    validateRatingForm(r); // butonu kilitle
+    r.ratingHint && (r.ratingHint.textContent = '');
 
-    r.ratingHint && (r.ratingHint.textContent = 'Thanks for rating!');
-    r.ratingHint && r.ratingHint.classList.add('ok');
+    const url = `${API_ROOT}/recipes/${encodeURIComponent(id)}/rating`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      let msg = 'Failed to send rating';
+      try {
+        const data = await res.json();
+        if (data?.message) msg = data.message;
+      } catch {}
+      throw new Error(`${msg} (HTTP ${res.status})`);
+    }
+
+    // Başarılı
+    if (r.ratingHint) {
+      r.ratingHint.textContent = 'Thanks for rating!';
+      r.ratingHint.classList.add('ok');
+    }
 
     // Güncel rating'i çekip popup üstündeki değeri/ikonları güncelle
     try {
@@ -400,6 +447,7 @@ document.addEventListener('click', async e => {
       r.ratingHint.classList.remove('ok');
     }
   } finally {
-    r.ratingSend && (r.ratingSend.disabled = false);
+    ratingSubmitting = false;
+    validateRatingForm(r); // form durumunu eski haline getir
   }
 });

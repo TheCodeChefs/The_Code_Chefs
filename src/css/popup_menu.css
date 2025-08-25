@@ -2,7 +2,7 @@
 .popup-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 5, 5, 0.6);
+  background: var(--input-text-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,7 +42,7 @@
   display: grid;
   place-items: center;
   z-index: 10;
-  color: #111;
+  color: var(--main-black);
 }
 .popup-x .icon {
   width: 20px;
@@ -86,7 +86,7 @@
   background-position: center;
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid rgba(5, 5, 5, 0.1);
+  border: 2px solid var(--input-border-color);
 }
 
 /* VİDEO */
@@ -97,7 +97,7 @@
   margin: 0 auto;
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid rgba(5, 5, 5, 0.1);
+  border: 2px solid var(--input-border-color);
 }
 
 .video-iframe {
@@ -158,7 +158,7 @@
   gap: 6px;
   align-items: center;
   height: 18px;
-  color: rgba(5, 5, 5, 0.5);
+  color: var(--input-text-color2);
   margin-bottom: 33px;
 }
 .rating-val {
@@ -175,7 +175,6 @@
   display: inline-flex;
   height: 18px;
   gap: 2px;
-  /* transform: translateY(1px); */
 }
 .star-row .icon {
   width: 18px;
@@ -195,7 +194,7 @@
   stroke: none;
 }
 .star-row .star.empty .icon {
-  color: #dcdcdc;
+  color: var(--input-text-color2);
 }
 .star-row .star.empty .icon * {
   fill: currentColor;
@@ -227,18 +226,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 0 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--input-border-color);
   font-size: 15px;
 }
 .ing-name {
-  color: var(--main-black);
+  color: var(--input-text-color);
   font-size: 14px;
   font-weight: var(--fw-regular);
   line-height: 18px;
   letter-spacing: 0;
 }
 .ing-measure {
-  color: rgba(5, 5, 5, 0.5);
+  color: var(--input-text-color);
   font-size: 14px;
   font-weight: var(--fw-regular);
   line-height: 18px;
@@ -254,10 +253,10 @@
 }
 .tag-chip {
   padding: 8px 16px;
-  border: 1px solid rgba(5, 5, 5, 0.2);
+  border: 1px solid var(--input-border-color);
   border-radius: 35px;
   background: transparent;
-  color: var(--main-black);
+  color: var(--input-text-color);
   font-size: 12px;
   font-weight: var(--fw-medium);
   line-height: 14px;
@@ -269,7 +268,7 @@
 .recipe-description {
   width: 295px;
   white-space: pre-wrap;
-  color: rgba(5, 5, 5, 0.8);
+  color: var(--input-text-color);
   font-size: 14px;
   font-weight: var(--fw-medium);
   line-height: 18px;
@@ -316,7 +315,7 @@
 }
 
 .btn-outline {
-  background: #f8f8f8;
+  background: var(--background-white);
   border: 2px solid var(--main-green, #9bb537);
   color: var(--main-black);
 }
@@ -360,6 +359,19 @@
   cursor: pointer;
   color: var(--main-black);
 }
+.rating-x .icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.rating-x .icon * {
+  stroke: currentColor !important;
+  fill: none !important;
+}
+.rating-x:hover .icon {
+  transform: scale(1.06);
+}
+
 .rating-title {
   margin: 0;
   font-size: 14px;
@@ -432,7 +444,7 @@
   width: 295px;
   height: 46px;
   border-radius: 15px;
-  border: 1px solid rgba(5, 5, 5, 0.2);
+  border: 1px solid var(--input-border-color);
   padding: 14px 18px;
   font-size: 14px;
   font-weight: var(--fw-medium);
@@ -443,7 +455,7 @@
   background: transparent;
 }
 .rating-email::placeholder {
-  color: rgba(5, 5, 5, 0.5);
+  color: var(--input-text-color);
 }
 .rating-email.invalid {
   border-color: #d24a4a;
@@ -476,7 +488,7 @@
 .rating-hint {
   margin: 8px 2px 0;
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--input-text-color);
 }
 .rating-hint.ok {
   color: #3b7b1a;
@@ -485,10 +497,10 @@
 /* YARIM YILDIZ GRADYAN RENGİ — SVG içindeki <stop>’ları boyar */
 .rating-card stop:first-child {
   stop-color: #eea10b;
-} /* altın */
+}
 .rating-card stop:last-child {
-  stop-color: #dcdcdc;
-} /* gri */
+  stop-color: var(--input-text-color2);
+}
 
 /* ≥768px tablet/desktop */
 @media (min-width: 768px) {
@@ -580,6 +592,11 @@
     height: 24px;
   }
 
+  .rating-x .icon {
+    width: 24px;
+    height: 24px;
+  }
+
   .rating-row {
     margin: 0 0 36px;
   }
@@ -596,4 +613,84 @@
     height: 48px;
     padding: 14px 150px;
   }
+}
+
+/* ===================== POPUP LAYOUT FIX (>=768px) ===================== */
+/* Mobilde mevcut akış kalsın; tablet/desktop’ta tags solda, rating/meta sağda */
+@media (min-width: 768px) {
+  .popup-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'media media'
+      'tags  meta'
+      'ing   ing'
+      'desc  desc'
+      'acts  acts';
+    gap: 16px 20px;
+  }
+
+  .div-reverse {
+    grid-area: media;
+  }
+  .tags {
+    grid-area: tags;
+  }
+  .meta-line {
+    grid-area: meta;
+  }
+  .ingredients {
+    grid-area: ing;
+  }
+  .recipe-description {
+    grid-area: desc;
+  }
+  .popup-actions {
+    grid-area: acts;
+  }
+
+  .tags,
+  .meta-line,
+  .recipe-description {
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  .media-wrapper {
+    justify-self: center;
+  }
+
+  .tags {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    justify-self: start;
+  }
+
+  .meta-line {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    justify-self: end;
+    height: 24px;
+  }
+
+  .ingredients {
+    margin: 0 !important;
+  }
+  .recipe-description {
+    margin: 24px 0 !important;
+  }
+  .popup-actions {
+    gap: 16px;
+  }
+}
+
+/* (Opsiyonel) Dark modda bazı çizgileri ve metayı netleştir */
+[data-theme='dark'] .meta-line {
+  color: #f0f0f0;
+}
+[data-theme='dark'] .ingredients .ing-row {
+  border-bottom-color: rgba(255, 255, 255, 0.18);
 }

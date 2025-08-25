@@ -4,11 +4,17 @@
   padding: 40px 0;
 }
 
+.favorites-filter .container {
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--container-padding, 0 20px); /* global padding değerini zorla */
+}
+
 /* === Kategori satırı === */
 .category-wrapper {
   width: 100%;
   margin: 0 auto;
-  padding: 0 0 24px 20px;
+  padding: 0 0 24px 0;
   display: flex;
   align-items: center; /* dikey merkez */
   gap: 12px;
@@ -61,14 +67,14 @@
 /* butonlar: eşit yükseklik + border dahil */
 .category {
   background-color: transparent;
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color2);
   width: auto;
   min-width: 60px;
 
   height: 46px; /* hepsi eşit */
   padding: 0 18px; /* dikey padding 0 → gerçek 46px */
   border-radius: 15px;
-  border: 1px solid rgba(5, 5, 5, 0.2);
+  border: 1px solid var(--input-border-color);
   box-sizing: border-box; /* border yükseklik içinde */
 
   font-size: 14px;
@@ -92,7 +98,7 @@
 .category:hover {
   background-color: var(--main-green);
   color: #f8f8f8;
-  filter: drop-shadow(0 2px 4px rgba(5, 5, 5, 0.3));
+  filter: drop-shadow(0 2px 4px var(--input-border-hover-color));
 }
 
 /* aktifte de 1px border kalsın → satır yüksekliği bozulmaz */
@@ -105,11 +111,11 @@
 /* All categories butonu */
 .all-categories-btn {
   background-color: transparent;
-  color: rgba(5, 5, 5, 0.3);
+  color: var(--input-text-color2);
   width: auto;
   height: 46px;
   padding: 0 18px;
-  border: 1px solid rgba(5, 5, 5, 0.2);
+  border: 1px solid var(--input-border-color);
   border-radius: 15px;
   font-size: 14px;
   font-weight: var(--fw-medium);
@@ -132,7 +138,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .recipe-card {
@@ -177,6 +183,7 @@
   font-weight: var(--fw-semibold);
   line-height: 18px;
   letter-spacing: 0;
+  color: #f8f8f8;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -214,7 +221,6 @@
   gap: 4px;
   align-items: center;
 }
-
 .star-icon {
   display: flex;
   gap: 0px;
@@ -288,7 +294,7 @@
   display: none;
 }
 
-/* === Pagination === */
+/* === Pagination (GÜNCEL) === */
 .pagination {
   display: flex;
   gap: 8px;
@@ -296,7 +302,13 @@
   align-items: center;
   margin-top: 24px;
 }
+.pagination .page-numbers {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
+/* ortak buton tabanı */
 .pagination button {
   width: 32px;
   height: 32px;
@@ -304,71 +316,117 @@
   font-size: 18px;
   font-weight: var(--fw-semibold);
   line-height: 1.22;
-  letter-spacing: 0;
   text-align: center;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease,
     border-color 0.2s ease;
 }
 
-.pagination button:not(.active):not(.page-icon) {
-  background-color: var(--background-white);
-  border: 1px solid rgba(5, 5, 5, 0.2);
+/* sayı butonları */
+.pagination .page-numbers button:not(.active):not(.dots) {
+  background: var(--background-white);
+  border: 1px solid var(--input-border-color);
   color: var(--main-black);
 }
-
-.pagination button:not(.active):not(:disabled):hover {
-  border-color: rgba(5, 5, 5, 0.3);
+.pagination .page-numbers button:not(.active):not(:disabled):hover {
+  border-color: var(--input-border-hover-color);
 }
-
-.pagination button.active {
-  background-color: var(--main-green);
+.pagination .page-numbers button.active {
+  background: var(--main-green);
   color: var(--main-black);
   border: none;
 }
-
-.pagination button.dots {
-  background-color: var(--background-white);
-  border: 1px solid rgba(5, 5, 5, 0.2);
+.pagination .page-numbers .dots {
+  background: var(--background-white);
+  border: 1px solid var(--input-border-color);
   color: var(--main-black);
   cursor: default;
 }
 
-.pagination button.dots:hover {
-  background-color: var(--background-white);
-  border-color: rgba(5, 5, 5, 0.3);
-}
-
-.pagination button.page-icon:not(:disabled) {
-  background-color: var(--main-green);
-  color: var(--main-black);
-  border: none;
-}
-
-.pagination button.page-icon:disabled {
-  background-color: var(--main-black);
-  color: rgba(248, 248, 248, 0.5);
-  cursor: default;
-}
-
-.pagination button.page-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.page-icon .double-icon {
+/* ok butonları – ENABLED tabanı */
+.pagination .page-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
+  padding: 0;
+  background: var(--main-green);
+  color: var(--main-black);
+  border: none;
 }
 
-.page-icon svg {
-  width: 8px;
-  height: 16px;
+/* ikon katmanları (sprite) */
+.pagination .page-icon .icon {
+  display: none;
+  width: 12px;
+  height: 12px;
+}
+
+/* ENABLED: sadece BASE görünür */
+.pagination .page-icon:not(:disabled) .icon-base {
   display: block;
+}
+
+/* LIGHT + DISABLED: zemin siyah, GRAY ikon */
+.pagination .page-icon:disabled {
+  background: var(--main-black) !important;
+  color: var(--input-text-color) !important;
+  border: none !important;
+}
+.pagination .page-icon:disabled .icon-gray {
+  display: block;
+}
+
+/* DARK + DISABLED: zemin beyaz, BASE (siyah) ikon */
+[data-theme='dark'] .pagination .page-icon:disabled {
+  background: #ffffff !important;
+  color: #050505 !important; /* base ikon currentColor→siyah */
+  border: 1px solid #2a2a2a !important;
+}
+[data-theme='dark'] .pagination .page-icon:disabled .icon-gray {
+  display: none;
+}
+[data-theme='dark'] .pagination .page-icon:disabled .icon-base {
+  display: block;
+}
+
+/* Çift ok (<<, >>) aralığını sıkılaştır */
+.pagination .page-icon svg + svg {
+  margin-left: 0 !important;
+}
+.pagination .page-icon.first .icon-base + .icon-base,
+.pagination .page-icon.first .icon-gray + .icon-gray,
+.pagination .page-icon.last .icon-base + .icon-base,
+.pagination .page-icon.last .icon-gray + .icon-gray {
+  margin-left: -5px !important; /* daha sıkı istersen -3px */
+}
+
+/* (opsiyonel) dark'ta dots/disabled sayılar görünümü */
+[data-theme='dark'] .pagination .page-numbers .dots,
+[data-theme='dark'] .pagination .page-numbers button:disabled:not(.page-icon) {
+  background-color: #0f0f0f !important;
+  border: 1px solid #2a2a2a !important;
+  color: #bdbdbd !important;
+}
+
+/* Dark mod: sayfa numaraları (aktif olmayanlar) beyaz border */
+[data-theme='dark'] .pagination .page-numbers button:not(.active):not(.dots) {
+  background-color: transparent !important; /* istersen #0f0f0f yapabilirsin */
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important; /* koyu zeminde okunurluk */
+}
+
+/* Dark mod: ... (dots) beyaz border */
+[data-theme='dark'] .pagination .page-numbers .dots {
+  background-color: transparent !important;
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Dark mod: devre dışı (disabled) numara butonları da beyaz border */
+[data-theme='dark'] .pagination .page-numbers button:disabled:not(.page-icon) {
+  background-color: transparent !important;
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important;
 }
 
 /* === Responsive === */
@@ -377,32 +435,36 @@
     padding: 58px 0;
   }
 
-  .category-wrapper {
-    padding: 0 0 32px 32px;
+  .favorites-filter .container {
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--container-padding, 0 32px);
   }
 
+  .category-wrapper {
+    padding: 0 0 32px 0;
+  }
   .category-list {
     gap: 15px;
   }
-
   .category {
     height: 48px;
     font-size: 16px;
     line-height: 20px;
   }
-
   .all-categories-btn {
     height: 48px;
     font-size: 16px;
     line-height: 20px;
   }
-
+  .favorites-list {
+    padding: 0;
+  }
   .favorites-list .recipe-card {
     min-width: 224px;
     height: 224px;
-    flex: 0 1 calc(33.333% - 16px);
+    flex: 0 1 calc(34% - 16px);
   }
-
   .empty-message {
     margin-top: 64px;
     min-height: auto;
@@ -419,24 +481,19 @@
     line-height: 24px;
     width: 481px;
   }
-
   .recipe-card-content {
     padding: 12px;
   }
-
   .star-group {
     gap: 2px;
   }
-
   .star-icon {
     gap: -2px;
   }
-
   .star-icon svg {
     width: 16px;
     height: 16px;
   }
-
   .recipe-meta button {
     width: 89px;
   }
@@ -448,6 +505,10 @@
     width: 40px;
     height: 40px;
   }
+  .pagination .page-icon .icon {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -455,37 +516,36 @@
     padding: 66px 0;
   }
 
+  .favorites-filter .container {
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--container-padding, 0 100px);
+  }
+
   .category-wrapper {
-    padding: 0 0 32px 100px;
+    padding: 0 0 32px 0;
   }
-
   .favorites-list {
-    padding: 0 80px;
+    padding: 0;
   }
-
   .favorites-list .recipe-card {
     min-width: 258px;
     height: 287px;
     flex: 0 1 calc(25% - 16px);
   }
-
   .recipe-card-content {
     padding: 12px;
   }
-
   .star-group {
     gap: 4px;
   }
-
   .star-icon {
     gap: 0;
   }
-
   .star-icon svg {
     width: 18px;
     height: 18px;
   }
-
   .recipe-meta button {
     width: 89px;
   }
@@ -493,5 +553,16 @@
   .pagination button {
     width: 44px;
     height: 44px;
+  }
+  .pagination .page-icon .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pagination .page-icon.first .icon-base + .icon-base,
+  .pagination .page-icon.first .icon-gray + .icon-gray,
+  .pagination .page-icon.last .icon-base + .icon-base,
+  .pagination .page-icon.last .icon-gray + .icon-gray {
+    margin-left: -6px !important;
   }
 }

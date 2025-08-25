@@ -1,32 +1,45 @@
 .favorites-hero {
   padding: 0;
+  /* üst boşluklar burada; container.css paddingle çakışmaz */
   padding-top: 44.5px;
 }
 
+/* Medya bloğu container genişliğinin tamamını kullanır */
 .f-hero__media {
+  width: 100%;
+  margin: 0; /* ortalama yok */
+  max-width: 100%; /* kısıtlama yok */
   border-radius: 20px;
   overflow: hidden;
   background: var(--background-white);
-  margin: 0 auto;
+  /* orantılı yükseklik istersen: */
+  /* aspect-ratio: 27 / 16;  */
 }
 
+/* Görsel tam doldursun */
+.f-hero__media picture,
 .f-hero__img {
+  display: block;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
+}
+.f-hero__img {
   object-fit: cover;
-  display: block;
-  border-radius: 15px;
+  border-radius: 15px; /* tasarımın istediği yuvarlaklık */
 }
 
-/* Mobil */
+/* Mobil (default) */
 @media (max-width: 767px) {
   .favorites-hero {
     padding-top: 44px;
   }
+
+  /* sabit yükseklik istiyorsan: */
   .f-hero__media {
-    width: 335px;
     height: 516px;
   }
+  /* ya da aspect-ratio kullanıyorsan, height verme. */
 }
 
 /* Tablet */
@@ -35,15 +48,13 @@
     padding-top: 34px;
   }
   .f-hero__media {
-    width: 704px;
     height: 356px;
-  }
+  } /* genişlik zaten %100 (container) */
 }
 
 /* Desktop */
 @media (min-width: 1280px) {
   .f-hero__media {
-    width: 1080px;
     height: 356px;
-  }
+  } /* genişlik yine %100 (container) */
 }

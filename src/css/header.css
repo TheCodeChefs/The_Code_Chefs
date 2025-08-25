@@ -10,7 +10,7 @@
     width: 100%;
     height: 100vh;
     background-color: var(--main-green);
-    z-index: 2;
+    z-index: 9999;
     padding: 20px;
     flex-direction: column;
     align-items: center;
@@ -19,14 +19,18 @@
   nav {
     display: none;
   }
-  .mobile-menu nav {
+  nav a {
+    color: #f6f6f6;
+    text-decoration: none;
+    margin-bottom: 10px;
+    font-weight: var(--fw-medium);
+  }
+  .nav-show {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-  .mobile-menu nav a {
-    margin-bottom: 16px;
+    z-index: 99;
     color: var(--background-white);
   }
   .close-button {
@@ -36,7 +40,7 @@
     font-size: 32px;
     border: none;
     background: none;
-    color: var(--main-white);
+    color: #f6f6f6;
     outline: none;
   }
   .toggle {
@@ -45,6 +49,13 @@
     background: none;
     width: 0;
     height: 0;
+    z-index: 10000;
+  }
+  .toggle:checked + .toggle-label::after {
+    left: 26px;
+  }
+  .toggle:checked + .toggle-label {
+    background-color: var(--main-green);
   }
   .toggle-label {
     visibility: hidden;
@@ -53,16 +64,18 @@
     display: block;
     background: #cecdcd;
     border-radius: 200px;
+    z-index: 10000;
   }
   .toggle-label::after {
     display: none;
     content: '';
     width: 19px;
     height: 19px;
-    background-color: var(--background-white);
+    background-color: #f6f6f6;
     border-radius: 200px;
     transition: all 0.3s ease-in-out;
     z-index: 5;
+    z-index: 10000;
   }
   header {
     width: 100%;
@@ -75,6 +88,7 @@
     font-weight: var(--fw-semibold);
     font-size: 16px;
     line-height: 1.2;
+    color: var(--main-black);
   }
   .logo span {
     color: var(--main-green);
@@ -88,7 +102,7 @@
   .basket-button svg {
     width: 24px;
     height: 24px;
-    color: var(--main-green);
+    color: var(--main-black);
   }
   .toggle-label-show {
     display: block;
@@ -96,11 +110,20 @@
     position: absolute;
     bottom: 20px;
     left: 20px;
+    z-index: 9999;
+  }
+  .toggle-label-show::after {
+    display: block;
+    visibility: visible;
+    position: absolute;
     z-index: 999;
   }
   .show {
-    display: block;
+    display: flex;
     visibility: visible;
+  }
+  .mobile-menu-color {
+    background-color: #050505;
   }
 }
 @media screen and (min-width: 768px) {
@@ -109,8 +132,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0px;
+    padding: 20px 10px;
   }
+
   .logo {
     font-weight: var(--fw-semibold);
     font-size: 16px;
@@ -136,7 +160,7 @@
   .basket-button svg {
     width: 24px;
     height: 24px;
-    color: var(--background-black);
+    color: var(--main-black);
   }
   .toggle {
     position: absolute;
@@ -163,13 +187,23 @@
     content: '';
     width: 19px;
     height: 19px;
-    background-color: var(--background-white);
+    color: #f6f6f6;
     border-radius: 200px;
     transition: all 0.3s ease-in-out;
     z-index: 5;
   }
+  .toggle:checked + .toggle-label::after {
+    transform: translateX(26px);
+    left: 26px;
+  }
+  .toggle:checked + .toggle-label {
+    background-color: var(--main-green);
+  }
   .close-button {
     display: none;
+  }
+  .close-button-show {
+    display: block;
   }
   .mobile-menu {
     display: none;
@@ -193,6 +227,12 @@
   }
 }
 header {
-  max-width: 1200px;
+  max-width: 1080px;
   margin: 0 auto;
+}
+.toggle:checked + .toggle-label::after {
+  left: 26px;
+}
+.toggle:checked + .toggle-label {
+  background-color: var(--main-green);
 }

@@ -12,7 +12,111 @@
 
   <div class="container">
     <div id="favorites-list" class="favorites-list"></div>
-    <div id="pagination-container" class="pagination"></div>
+
+    <div id="pagination-container" class="pagination" aria-label="Pagination">
+      <!-- << -->
+      <button
+        class="page-icon first"
+        type="button"
+        aria-label="First page"
+        disabled
+      >
+        <!-- ENABLED/BASE (2 adet) -->
+        <svg class="icon icon-base" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-left-icon"
+            xlink:href="./img/icons.svg#icon-pg-left-icon"
+          ></use>
+        </svg>
+        <svg class="icon icon-base" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-left-icon"
+            xlink:href="./img/icons.svg#icon-pg-left-icon"
+          ></use>
+        </svg>
+        <!-- DISABLED/LIGHT: GRAY (2 adet) -->
+        <svg class="icon icon-gray" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-left-icon-gray"
+            xlink:href="./img/icons.svg#icon-pg-left-icon-gray"
+          ></use>
+        </svg>
+        <svg class="icon icon-gray" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-left-icon-gray"
+            xlink:href="./img/icons.svg#icon-pg-left-icon-gray"
+          ></use>
+        </svg>
+      </button>
+
+      <!-- < -->
+      <button
+        class="page-icon prev"
+        type="button"
+        aria-label="Previous page"
+        disabled
+      >
+        <svg class="icon icon-base" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-left-icon"
+            xlink:href="./img/icons.svg#icon-pg-left-icon"
+          ></use>
+        </svg>
+        <svg class="icon icon-gray" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-left-icon-gray"
+            xlink:href="./img/icons.svg#icon-pg-left-icon-gray"
+          ></use>
+        </svg>
+      </button>
+
+      <!-- SAYI BUTONLARI (JS doldurur) -->
+      <div class="page-numbers" role="group" aria-label="Page numbers"></div>
+
+      <!-- > -->
+      <button class="page-icon next" type="button" aria-label="Next page">
+        <svg class="icon icon-base" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-right-icon"
+            xlink:href="./img/icons.svg#icon-pg-right-icon"
+          ></use>
+        </svg>
+        <svg class="icon icon-gray" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-right-icon-gray"
+            xlink:href="./img/icons.svg#icon-pg-right-icon-gray"
+          ></use>
+        </svg>
+      </button>
+
+      <!-- >> -->
+      <button class="page-icon last" type="button" aria-label="Last page">
+        <svg class="icon icon-base" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-right-icon"
+            xlink:href="./img/icons.svg#icon-pg-right-icon"
+          ></use>
+        </svg>
+        <svg class="icon icon-base" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-right-icon"
+            xlink:href="./img/icons.svg#icon-pg-right-icon"
+          ></use>
+        </svg>
+        <svg class="icon icon-gray" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-right-icon-gray"
+            xlink:href="./img/icons.svg#icon-pg-right-icon-gray"
+          ></use>
+        </svg>
+        <svg class="icon icon-gray" aria-hidden="true" focusable="false">
+          <use
+            href="./img/icons.svg#icon-pg-right-icon-gray"
+            xlink:href="./img/icons.svg#icon-pg-right-icon-gray"
+          ></use>
+        </svg>
+      </button>
+    </div>
 
     <div id="empty-message" class="empty-message hidden">
       <svg width="80" height="80" aria-hidden="true" focusable="false">

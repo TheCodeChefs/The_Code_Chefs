@@ -210,7 +210,7 @@ async function fetchAndRenderRecipes(page = 1) {
         width="97"
         height="83"
       >
-        <use href="../svg/symbol-defs.svg#icon-empty-recipes"></use>
+        <use href="./svg/symbol-defs.svg#icon-empty-recipes"></use>
         </svg>
         <p>No recipes found.</p>`;
       paginationEl.innerHTML = '';
@@ -241,7 +241,7 @@ function renderRating(rating) {
         fill="none"
         stroke="currentColor"
       >
-        <use href="../svg/symbol-defs.svg#icon-yellow-star"></use>
+        <use href="./svg/symbol-defs.svg#icon-yellow-star"></use>
         </svg>`;
     } else {
       str += ` <svg
@@ -251,7 +251,7 @@ function renderRating(rating) {
         fill="none"
         stroke="currentColor"
       >
-        <use href="../svg/symbol-defs.svg#icon-empty-star"></use>
+        <use href="./svg/symbol-defs.svg#icon-empty-star"></use>
         </svg>`;
     }
   }
@@ -265,13 +265,13 @@ function renderFavoriteIcon(id) {
             class="icon-white-heart"
             viewBox="0 0 24 24"
         >
-            <use href="../svg/symbol-defs.svg#icon-white-heart"></use>
+            <use href="./svg/symbol-defs.svg#icon-white-heart"></use>
         </svg>`
     : `<svg
             class="icon-heart"
             viewBox="0 0 24 24"
         >
-            <use href="../svg/symbol-defs.svg#icon-heart"></use>
+            <use href="./svg/symbol-defs.svg#icon-heart"></use>
         </svg>`;
 }
 
@@ -405,8 +405,8 @@ function renderPagination(totalPages, currentPage) {
             class="icon-left-arrow-1 double"
             viewBox="0 0 48 48"
         >
-            <use href="../svg/symbol-defs.svg#icon-left-arrow-1" transform="translate(-7, 0)"></use>
-            <use href="../svg/symbol-defs.svg#icon-left-arrow-1" transform="translate(20, 0)"></use>
+            <use href="./svg/symbol-defs.svg#icon-left-arrow-1" transform="translate(-7, 0)"></use>
+            <use href="./svg/symbol-defs.svg#icon-left-arrow-1" transform="translate(20, 0)"></use>
         </svg>`,
       1,
       currentPage === 1,
@@ -420,7 +420,7 @@ function renderPagination(totalPages, currentPage) {
             class="icon-left-arrow-1"
             viewBox="0 0 24 24"
         >
-            <use href="../svg/symbol-defs.svg#icon-left-arrow-1"></use>
+            <use href="./svg/symbol-defs.svg#icon-left-arrow-1"></use>
         </svg>`,
       currentPage - 1,
       currentPage === 1,
@@ -449,7 +449,7 @@ function renderPagination(totalPages, currentPage) {
             class="icon-right-arrow-1"
             viewBox="0 0 24 24"
         >
-            <use href="../svg/symbol-defs.svg#icon-right-arrow-1"></use>
+            <use href="./svg/symbol-defs.svg#icon-right-arrow-1"></use>
         </svg>`,
       currentPage + 1,
       currentPage === totalPages,
@@ -463,8 +463,8 @@ function renderPagination(totalPages, currentPage) {
             class="icon-right-arrow-1 double"
             viewBox="0 0 48 48"
         >
-            <use href="../svg/symbol-defs.svg#icon-right-arrow-1" transform="translate(-7, 0)"></use>
-            <use href="../svg/symbol-defs.svg#icon-right-arrow-1" transform="translate(20, 0)"></use>
+            <use href="./svg/symbol-defs.svg#icon-right-arrow-1" transform="translate(-7, 0)"></use>
+            <use href="./svg/symbol-defs.svg#icon-right-arrow-1" transform="translate(20, 0)"></use>
         </svg></span>`,
       totalPages,
       currentPage === totalPages,

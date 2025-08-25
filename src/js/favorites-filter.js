@@ -1,31 +1,52 @@
-// SVG sprite helper
-const SPRITE_PATH = '../img/icons.svg';
+// === SVG sprite helper (kalp, yıldız vb. için)
+const SPRITE_PATH = './img/icons.svg';
 function svgIcon(name, className = '') {
+  const ref = `${SPRITE_PATH}#icon-${name}`;
   return `<svg class="icon ${className}" aria-hidden="true" focusable="false">
-    <use href="${SPRITE_PATH}#icon-${name}"></use>
+    <use href="${ref}" xlink:href="${ref}"></use>
   </svg>`;
 }
 
-/* ===== Kategori barını container soluna hizala (eski doğru davranış) ===== */
-function alignWithContainer() {
-  const section = document.querySelector('.favorites-filter');
-  const container = section?.querySelector('.container');
+/* ===== Category: solda container iç çizgisi, sağda viewport kenarı ===== */
+function alignCategoryToViewportRight() {
   const wrapper = document.querySelector('.category-wrapper');
-  if (!container || !wrapper) return;
+  if (!wrapper) return;
+
+  const container =
+    wrapper.closest('.container') ||
+    document.querySelector('.favorites-filter .container') ||
+    document.querySelector('.container');
+  if (!container) return;
 
   const vw = window.innerWidth;
-  const cw = container.offsetWidth;
-  const leftSpace = (vw - cw) / 2;
+  const rect = container.getBoundingClientRect();
+  const cs = window.getComputedStyle(container);
+  const pl = parseFloat(cs.paddingLeft) || 0;
 
-  // tasarımdaki base iç boşluk
-  let extra = 20;
-  if (vw >= 768 && vw < 1280) extra = 32;
-  else if (vw >= 1280) extra = 100;
+  let startX = rect.left + pl;
+  let width = vw - startX;
 
-  wrapper.style.paddingLeft = `${Math.max(0, leftSpace + extra)}px`;
+  startX = Math.max(0, Math.round(startX));
+  width = Math.max(0, Math.round(width));
+
+  wrapper.style.marginLeft = '0';
+  wrapper.style.marginRight = '0';
+  wrapper.style.maxWidth = 'none';
+
+  wrapper.style.width = `${width}px`;
+  wrapper.style.boxSizing = 'border-box';
+  wrapper.style.position = 'relative';
+  wrapper.style.transform = `translateX(${startX}px)`;
 }
-window.addEventListener('load', alignWithContainer);
-window.addEventListener('resize', alignWithContainer);
+
+// Debounce
+let __alignTimer;
+function __reqAlign() {
+  clearTimeout(__alignTimer);
+  __alignTimer = setTimeout(alignCategoryToViewportRight, 80);
+}
+window.addEventListener('load', alignCategoryToViewportRight);
+window.addEventListener('resize', __reqAlign);
 
 /* ===== Cross-tab publish (index.html & favorites.html arası) ===== */
 const favBC =
@@ -38,7 +59,7 @@ function broadcastFavoritesChange() {
   } catch {}
 }
 
-/* === localStorage helpers */
+/* === localStorage helpers === */
 function getFavoritesLS() {
   try {
     const v = JSON.parse(localStorage.getItem('favorites'));
@@ -49,7 +70,6 @@ function getFavoritesLS() {
 }
 function setFavoritesLS(arr) {
   localStorage.setItem('favorites', JSON.stringify(arr || []));
-  // Tek yerden yayın
   broadcastFavoritesChange();
 }
 function getRecipeIdSafe(r) {
@@ -69,23 +89,18 @@ const esc = s =>
       }[m])
   );
 
-// === Yıldızlar (boş yıldız eklemez; sadece dolu yıldız sayısı kadar gösterir)
+// === Yıldızlar
 function getStarIcons(rating = 0, { max = 5, fillEmpty = false } = {}) {
   const full = Math.max(0, Math.min(max, Math.floor(Number(rating) || 0)));
   const filled = Array.from({ length: full })
     .map(() => svgIcon('Star', 'star-icon'))
     .join('');
-
-  if (!fillEmpty) {
-    // 5'e tamamlayan boş/siyah yıldız istenmiyor
-    return filled;
-  }
+  if (!fillEmpty) return filled;
 
   const empty = Math.max(0, max - full);
   const empties = Array.from({ length: empty })
     .map(() => svgIcon('Star-empty', 'star-icon empty'))
     .join('');
-
   return `${filled}${empties}`;
 }
 
@@ -108,7 +123,7 @@ const state = {
   currentPage: 1,
   currentCategory: 'All',
   recipesPerPage: getRecipesPerPage(),
-  isLoading: false, // LOADING bayrağı
+  isLoading: false,
 };
 
 window.addEventListener('resize', () => {
@@ -133,7 +148,7 @@ const categoryListEl = document.getElementById('category-list');
 const allBtn = document.getElementById('all-categories-btn');
 const categoryWrapperEl = document.querySelector('.category-wrapper');
 
-// LOADING elemanı (dinamik eklenir)
+/* LOADING elemanı */
 let loadingEl = null;
 function ensureLoadingEl() {
   if (!loadingEl) {
@@ -155,7 +170,6 @@ function showLoading() {
   const p = getPaginationEl();
   if (p) p.style.display = 'none';
   if (favoritesListEl) favoritesListEl.innerHTML = '';
-  // LOADING sırasında kategori çubuğunu da gizle
   if (categoryWrapperEl) categoryWrapperEl.style.display = 'none';
 }
 function hideLoading() {
@@ -163,12 +177,9 @@ function hideLoading() {
   if (loadingEl) loadingEl.style.display = 'none';
 }
 
-// Her zaman mevcut #pagination-container’ı kullan
 function getPaginationEl() {
   let el = document.getElementById('pagination-container');
-  if (!el) {
-    el = document.querySelector('.pagination');
-  }
+  if (!el) el = document.querySelector('.pagination');
   return el;
 }
 
@@ -180,15 +191,12 @@ function ensureBaseRefs() {
 function renderCategories(items) {
   if (!ensureBaseRefs()) return;
 
-  // FAVORITES BOŞSA → kategori barını tamamen gizle
   if (!items || items.length === 0) {
     if (categoryWrapperEl) categoryWrapperEl.style.display = 'none';
     categoryListEl.innerHTML = '';
-    // All categories butonunu da pasif bırak
     if (allBtn) allBtn.classList.remove('active');
     return;
   } else {
-    // veri varsa görünür yap
     if (categoryWrapperEl) categoryWrapperEl.style.display = '';
   }
 
@@ -225,121 +233,105 @@ function renderCategories(items) {
   });
 
   setActiveClasses();
+  alignCategoryToViewportRight();
 }
 
-/* ==== Pagination ==== */
+/* ==== Pagination (yalnızca sayıları ve enable/disable'ı yönetir) ==== */
 function renderPagination(totalPages) {
-  const paginationEl = getPaginationEl();
-  if (!paginationEl) return;
-  paginationEl.innerHTML = '';
+  const container = getPaginationEl();
+  if (!container) return;
 
   if (!Number.isFinite(totalPages) || totalPages <= 1) {
-    paginationEl.style.display = 'none';
+    container.style.display = 'none';
     return;
   }
-  paginationEl.style.display = 'flex';
+  container.style.display = 'flex';
 
-  const iconLeft = isDisabled =>
-    svgIcon(isDisabled ? 'pg-left-icon-gray' : 'pg-left-icon');
-  const iconRight = isDisabled =>
-    svgIcon(isDisabled ? 'pg-right-icon-gray' : 'pg-right-icon');
+  const btnFirst = container.querySelector('.page-icon.first');
+  const btnPrev = container.querySelector('.page-icon.prev');
+  const btnNext = container.querySelector('.page-icon.next');
+  const btnLast = container.querySelector('.page-icon.last');
+  const numbersWrap = container.querySelector('.page-numbers');
 
-  const addButton = (
-    label,
-    page,
-    isDisabled = false,
-    className = '',
-    htmlContent = null
-  ) => {
-    const btn = document.createElement('button');
-    btn.className = className;
-    if (htmlContent) btn.innerHTML = htmlContent;
-    else btn.textContent = label;
-    if (isDisabled) btn.disabled = true;
-    if (!isDisabled && page) {
-      btn.addEventListener('click', () => {
-        state.currentPage = page;
+  const atFirst = state.currentPage === 1;
+  const atLast = state.currentPage === totalPages;
+  if (btnFirst) btnFirst.disabled = atFirst;
+  if (btnPrev) btnPrev.disabled = atFirst;
+  if (btnNext) btnNext.disabled = atLast;
+  if (btnLast) btnLast.disabled = atLast;
+
+  const [start, end] = getPaginationRange(state.currentPage, totalPages);
+  const frag = document.createDocumentFragment();
+
+  if (start > 1) {
+    const dotsL = document.createElement('button');
+    dotsL.className = 'dots';
+    dotsL.textContent = '…';
+    dotsL.disabled = true;
+    frag.appendChild(dotsL);
+  }
+
+  for (let i = start; i <= end; i++) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = String(i);
+    if (i === state.currentPage) b.classList.add('active');
+    b.addEventListener('click', () => {
+      if (state.currentPage !== i) {
+        state.currentPage = i;
         renderCards();
-      });
-    }
-    paginationEl.appendChild(btn);
-  };
-
-  // <<
-  addButton(
-    '',
-    1,
-    state.currentPage === 1,
-    'page-icon',
-    `<span class="double-icon">${iconLeft(state.currentPage === 1)}${iconLeft(
-      state.currentPage === 1
-    )}</span>`
-  );
-
-  // <
-  addButton(
-    '',
-    state.currentPage - 1,
-    state.currentPage === 1,
-    'page-icon',
-    iconLeft(state.currentPage === 1)
-  );
-
-  const range = getPaginationRange(state.currentPage, totalPages);
-
-  if (range[0] > 1) {
-    const dots = document.createElement('button');
-    dots.textContent = '...';
-    dots.className = 'dots';
-    dots.disabled = true;
-    paginationEl.appendChild(dots);
-  }
-
-  for (let i = range[0]; i <= range[1]; i++) {
-    const btn = document.createElement('button');
-    btn.textContent = i;
-    if (i === state.currentPage) btn.classList.add('active');
-    btn.addEventListener('click', () => {
-      state.currentPage = i;
-      renderCards();
+      }
     });
-    paginationEl.appendChild(btn);
+    frag.appendChild(b);
   }
 
-  if (range[1] < totalPages) {
-    const dots = document.createElement('button');
-    dots.textContent = '...';
-    dots.className = 'dots';
-    dots.disabled = true;
-    paginationEl.appendChild(dots);
+  if (end < totalPages) {
+    const dotsR = document.createElement('button');
+    dotsR.className = 'dots';
+    dotsR.textContent = '…';
+    dotsR.disabled = true;
+    frag.appendChild(dotsR);
   }
 
-  // >
-  addButton(
-    '',
-    state.currentPage + 1,
-    state.currentPage === totalPages,
-    'page-icon',
-    iconRight(state.currentPage === totalPages)
-  );
+  if (numbersWrap) {
+    numbersWrap.innerHTML = '';
+    numbersWrap.appendChild(frag);
+  }
 
-  // >>
-  addButton(
-    '',
-    totalPages,
-    state.currentPage === totalPages,
-    'page-icon',
-    `<span class="double-icon">${iconRight(
-      state.currentPage === totalPages
-    )}${iconRight(state.currentPage === totalPages)}</span>`
-  );
+  if (btnFirst)
+    btnFirst.onclick = () => {
+      if (!btnFirst.disabled) {
+        state.currentPage = 1;
+        renderCards();
+      }
+    };
+  if (btnPrev)
+    btnPrev.onclick = () => {
+      if (!btnPrev.disabled) {
+        state.currentPage = Math.max(1, state.currentPage - 1);
+        renderCards();
+      }
+    };
+  if (btnNext)
+    btnNext.onclick = () => {
+      if (!btnNext.disabled) {
+        state.currentPage = Math.min(totalPages, state.currentPage + 1);
+        renderCards();
+      }
+    };
+  if (btnLast)
+    btnLast.onclick = () => {
+      if (!btnLast.disabled) {
+        state.currentPage = totalPages;
+        renderCards();
+      }
+    };
 }
 
 /* ==== Cards ==== */
 function renderCards() {
   if (!ensureBaseRefs()) return;
 
-  // LOADING aşamasında liste/pagination manipüle etme
   if (state.isLoading) {
     const p = getPaginationEl();
     if (p) p.style.display = 'none';
@@ -408,7 +400,7 @@ function renderCards() {
           <span class="star-group">
             ${Number(recipe.rating ?? 0).toFixed(2)}
             <span class="star-icon">
-              ${getStarIcons(recipe.rating)} 
+              ${getStarIcons(recipe.rating)}
             </span>
           </span>
           <button class="secondary-button see-recipe-btn">See recipe</button>
@@ -416,37 +408,42 @@ function renderCards() {
       </div>
     `;
 
-    // Favorilerden kaldır (kalp)
-    card.querySelector('.heart').addEventListener('click', () => {
-      const rid = String(getRecipeIdSafe(recipe));
-      const all = getFavoritesLS();
-      const idx = all.findIndex(r => String(getRecipeIdSafe(r)) === rid);
-      if (idx !== -1) {
-        all.splice(idx, 1);
-        setFavoritesLS(all); // setFavoritesLS → broadcastFavoritesChange()
-      }
-      // Yeni yayın akışı zaten renderAll tetikliyor
-    });
+    const heartEl = card.querySelector('.heart');
+    if (heartEl) {
+      heartEl.addEventListener('click', () => {
+        const rid = String(getRecipeIdSafe(recipe));
+        const all = getFavoritesLS();
+        const idx = all.findIndex(r => String(getRecipeIdSafe(r)) === rid);
+        if (idx !== -1) {
+          all.splice(idx, 1);
+          setFavoritesLS(all); // setFavoritesLS → broadcastFavoritesChange()
+        }
+      });
+    }
 
-    // Popup aç
-    card.querySelector('.see-recipe-btn').addEventListener('click', () => {
-      if (typeof window.openPopup === 'function') {
-        window.openPopup(recipe);
-      } else {
-        console.error(
-          '❌ window.openPopup bulunamadı. popup_menu.js yüklendi mi?'
-        );
-      }
-    });
+    const seeBtn = card.querySelector('.see-recipe-btn');
+    if (seeBtn) {
+      seeBtn.addEventListener('click', () => {
+        if (typeof window.openPopup === 'function') {
+          window.openPopup(recipe);
+        } else {
+          console.error(
+            '❌ window.openPopup bulunamadı. popup_menu.js yüklendi mi?'
+          );
+        }
+      });
+    }
 
     favoritesListEl.appendChild(card);
   });
 
-  // veri var → kategori barını görünür yap
   if (categoryWrapperEl) categoryWrapperEl.style.display = '';
 
   // pagination’ı sadece 1’den büyükse göster
   renderPagination(totalPages);
+
+  // Kartlar sonrası hizalamayı yinele (kategori yüksekliği değişebilir)
+  alignCategoryToViewportRight();
 }
 
 /* ==== Hepsini render eden ==== */
@@ -479,6 +476,7 @@ window.addEventListener('load', () => {
       clearInterval(t);
       hideLoading();
       renderAll(); // veri varsa listele, yoksa boş mesaj + kategori gizli
+      alignCategoryToViewportRight();
     }
   }, 500);
 });
@@ -488,11 +486,13 @@ window.addEventListener('storage', e => {
   if (e.key === 'favorites') {
     hideLoading();
     renderAll();
+    alignCategoryToViewportRight();
   }
 });
 window.addEventListener('favorites:updated', () => {
   hideLoading();
   renderAll();
+  alignCategoryToViewportRight();
 });
 // BroadcastChannel’dan gelen mesajlar
 if (favBC) {
@@ -500,6 +500,7 @@ if (favBC) {
     if (ev.data?.type === 'favorites:updated') {
       hideLoading();
       renderAll();
+      alignCategoryToViewportRight();
     }
   };
 }
